@@ -59,6 +59,7 @@ struct EditMetadataView: View {
     @State var picture: String
     @State var banner: String
     @State var nip05: String
+    @State var nip69: String
     @State var name: String
     @State var ln: String
     @State var website: String
@@ -78,6 +79,7 @@ struct EditMetadataView: View {
         _banner = State(initialValue: data?.banner ?? "")
         _nip05 = State(initialValue: data?.nip05 ?? "")
         _ln = State(initialValue: data?.lud16 ?? data?.lud06 ?? "")
+        _nip69 = State(initialValue: data?.nip69 ?? "")
     }
     
     func imageBorderColor() -> Color {
@@ -94,7 +96,8 @@ struct EditMetadataView: View {
             picture: picture.isEmpty ? nil : picture,
             banner: banner.isEmpty ? nil : banner,
             lud06: ln.contains("@") ? nil : ln,
-            lud16: ln.contains("@") ? ln : nil
+            lud16: ln.contains("@") ? ln : nil,
+            nip69: nip69.isEmpty ? nil : nip69
         );
         
         let m_metadata_ev = make_metadata_event(keypair: damus_state.keypair, metadata: metadata)
@@ -106,6 +109,10 @@ struct EditMetadataView: View {
     
     var nip05_parts: NIP05? {
         return NIP05.parse(nip05)
+    }
+    
+    var nip69_parts: NIP69? {
+        return NIP69.parse(nip69)
     }
     
     var TopSection: some View {
@@ -197,6 +204,20 @@ struct EditMetadataView: View {
                         Text("'\(parts.username)' at '\(parts.host)' will be used for verification", comment: "Description of how the nip05 identifier would be used for verification.")
                     } else {
                         Text("'\(nip05)' is an invalid nip05 identifier. It should look like an email.", comment: "Description of why the nip05 identifier is invalid.")
+                    }
+                })
+                
+                Section(content: {
+                    TextField(NSLocalizedString("larry.btc", comment: "Placeholder example text for identifier used for NIP-69 verification."), text: $nip69)
+                        .autocorrectionDisabled(true)
+                        .textInputAutocapitalization(.never)
+                }, header: {
+                    Text("NIP-69 Nostr Name", comment: "Label for NIP-69 Verification section of user profile form.")
+                }, footer: {
+                    if let parts = nip69_parts {
+                        Text("'\(parts.name)' will be used as your Nostr name.", comment: "Description of how the nip69 identifier will be used.")
+                    } else {
+                        Text("'\(nip05)' is an invalid nip69 name. It should look like a domain name.", comment: "Description of why the nip69 name is invalid.")
                     }
                 })
 

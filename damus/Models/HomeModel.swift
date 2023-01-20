@@ -503,8 +503,10 @@ func process_metadata_event(profiles: Profiles, ev: NostrEvent) {
     }
 
     var old_nip05: String? = nil
+    var old_nip69: String? = nil
     if let mprof = profiles.lookup_with_timestamp(id: ev.pubkey) {
         old_nip05 = mprof.profile.nip05
+        old_nip69 = mprof.profile.nip69
         if mprof.timestamp > ev.created_at {
             // skip if we already have an newer profile
             return
@@ -523,6 +525,21 @@ func process_metadata_event(profiles: Profiles, ev: NostrEvent) {
             
             DispatchQueue.main.async {
                 profiles.validated[ev.pubkey] = validated
+                notify(.profile_updated, ProfileUpdate(pubkey: ev.pubkey, profile: profile))
+            }
+        }
+    }
+    
+    if let nip69 = profile.nip69, old_nip69 != profile.nip69 {
+        Task.detached(priority: .background) {
+            print("validating nip69 for '\(nip69)'")
+            let validated = await validate_nip69(pubkey: ev.pubkey, nip69_str: nip69)
+            if validated != nil {
+                print("validated nip69 for '\(nip69)'")
+            }
+            
+            DispatchQueue.main.async {
+                profiles.has_name[ev.pubkey] = validated
                 notify(.profile_updated, ProfileUpdate(pubkey: ev.pubkey, profile: profile))
             }
         }

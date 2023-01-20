@@ -30,13 +30,12 @@ struct NIP05Badge: View {
     
     var body: some View {
         HStack(spacing: 2) {
-            Image(systemName: "checkmark.seal.fill")
-                .font(.footnote)
-                .foregroundColor(nip05_color)
+     
             if show_domain {
+             
                 if clickable {
-                    Text(nip05.host)
-                        .foregroundColor(nip05_color)
+                    Text("\(nip05.username)@\(nip05.host)")
+                        .foregroundColor(.gray)
                         .onTapGesture {
                             if let nip5url = nip05.siteUrl {
                                 openURL(nip5url)
@@ -44,8 +43,11 @@ struct NIP05Badge: View {
                         }
                 } else {
                     Text(nip05.host)
-                        .foregroundColor(nip05_color)
+                        
                 }
+                Image(systemName: "checkmark.seal.fill")
+                    .font(.footnote)
+                    .foregroundColor(nip05_color)
             }
         }
 

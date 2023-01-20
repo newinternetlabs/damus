@@ -12,9 +12,14 @@ import UIKit
 class Profiles {
     var profiles: [String: TimestampedProfile] = [:]
     var validated: [String: NIP05] = [:]
+    var has_name: [String: NIP69] = [:]
     
     func is_validated(_ pk: String) -> NIP05? {
         return validated[pk]
+    }
+    
+    func is_has_name(_ pk: String) -> NIP69? {
+        return has_name[pk]
     }
     
     func add(id: String, profile: TimestampedProfile) {

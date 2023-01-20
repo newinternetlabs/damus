@@ -31,26 +31,30 @@ struct ProfileName: View {
     
     let show_friend_confirmed: Bool
     let show_nip5_domain: Bool
+    let show_nip69_name: Bool
     
     @State var display_name: String?
     @State var nip05: NIP05?
+    @State var nip69: NIP69?
 
-    init(pubkey: String, profile: Profile?, damus: DamusState, show_friend_confirmed: Bool, show_nip5_domain: Bool = true) {
+    init(pubkey: String, profile: Profile?, damus: DamusState, show_friend_confirmed: Bool, show_nip5_domain: Bool = true, show_nip69_name: Bool = true) {
         self.pubkey = pubkey
         self.profile = profile
         self.prefix = ""
         self.show_friend_confirmed = show_friend_confirmed
         self.show_nip5_domain = show_nip5_domain
+        self.show_nip69_name = show_nip69_name
         self.damus_state = damus
     }
     
-    init(pubkey: String, profile: Profile?, prefix: String, damus: DamusState, show_friend_confirmed: Bool, show_nip5_domain: Bool = true) {
+    init(pubkey: String, profile: Profile?, prefix: String, damus: DamusState, show_friend_confirmed: Bool, show_nip5_domain: Bool = true, show_nip69_name: Bool = true) {
         self.pubkey = pubkey
         self.profile = profile
         self.prefix = prefix
         self.damus_state = damus
         self.show_friend_confirmed = show_friend_confirmed
         self.show_nip5_domain = show_nip5_domain
+        self.show_nip69_name = show_nip69_name
     }
     
     var friend_icon: String? {
@@ -61,31 +65,54 @@ struct ProfileName: View {
         nip05 ?? damus_state.profiles.is_validated(pubkey)
     }
     
+    var current_nip69: NIP69? {
+        nip69 ?? damus_state.profiles.is_has_name(pubkey)
+    }
+    
     var nip05_color: Color {
         return get_nip05_color(pubkey: pubkey, contacts: damus_state.contacts)
     }
     
     var body: some View {
-        HStack(spacing: 2) {
-            Text(prefix + String(display_name ?? Profile.displayName(profile: profile, pubkey: pubkey)))
-                .font(.body)
-                .fontWeight(prefix == "@" ? .none : .bold)
+        VStack(alignment:.leading) {
+            HStack(spacing: 2) {
+                if let nip69 = current_nip69 {
+                    Text(prefix + String(nip69.name))
+                        .font(.body)
+                        .fontWeight(prefix == "@" ? .none : .bold).foregroundColor(.accentColor)
+                    NIP69Badge(nip69: nip69, pubkey: pubkey, contacts: damus_state.contacts, clickable: true)
+                } else {
+                    Text(prefix + String(display_name ?? Profile.displayName(profile: profile, pubkey: pubkey)))
+                        .font(.body)
+                        .fontWeight(prefix == "@" ? .none : .bold)
+                }
+                if let friend = friend_icon, current_nip05 == nil {
+                    Image(systemName: friend)
+                        .foregroundColor(.gray)
+                }
+            }
+            .onReceive(handle_notify(.profile_updated)) { notif in
+                let update = notif.object as! ProfileUpdate
+                if update.pubkey != pubkey {
+                    return
+                }
+                display_name = Profile.displayName(profile: update.profile, pubkey: pubkey)
+                nip05 = damus_state.profiles.is_validated(pubkey)
+            }
+            
             if let nip05 = current_nip05 {
                 NIP05Badge(nip05: nip05, pubkey: pubkey, contacts: damus_state.contacts, show_domain: show_nip5_domain, clickable: true)
             }
-            if let friend = friend_icon, current_nip05 == nil {
-                Image(systemName: friend)
-                    .foregroundColor(.gray)
-            }
-        }
-        .onReceive(handle_notify(.profile_updated)) { notif in
+        }.onReceive(handle_notify(.profile_updated)) { notif in
             let update = notif.object as! ProfileUpdate
             if update.pubkey != pubkey {
                 return
             }
             display_name = Profile.displayName(profile: update.profile, pubkey: pubkey)
             nip05 = damus_state.profiles.is_validated(pubkey)
+            nip69 = damus_state.profiles.is_has_name(pubkey)
         }
+        
     }
 }
 

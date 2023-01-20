@@ -13,6 +13,11 @@
 		31D2E847295218AF006D67F8 /* Shimmer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31D2E846295218AF006D67F8 /* Shimmer.swift */; };
 		3A4325A82961E11400BFCD9D /* Localizable.stringsdict in Resources */ = {isa = PBXBuildFile; fileRef = 3A4325AA2961E11400BFCD9D /* Localizable.stringsdict */; };
 		3ACBCB78295FE5C70037388A /* TimeAgoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3ACBCB77295FE5C70037388A /* TimeAgoTests.swift */; };
+		46CB2E75297692BB003AF1DD /* NIP69.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46CB2E74297692BB003AF1DD /* NIP69.swift */; };
+		46CB2E772976AC1F003AF1DD /* NIP69Badge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46CB2E762976AC1F003AF1DD /* NIP69Badge.swift */; };
+		46CB2E792977F2CF003AF1DD /* ZonefileParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46CB2E782977F2CF003AF1DD /* ZonefileParser.swift */; };
+		46CB2E7B2977F49C003AF1DD /* zone-file-1.0.0.js in Resources */ = {isa = PBXBuildFile; fileRef = 46CB2E7A2977F49C003AF1DD /* zone-file-1.0.0.js */; };
+		46CB2E7D2977F59C003AF1DD /* nip69.js in Resources */ = {isa = PBXBuildFile; fileRef = 46CB2E7C2977F59C003AF1DD /* nip69.js */; };
 		4C06670128FC7C5900038D2A /* RelayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C06670028FC7C5900038D2A /* RelayView.swift */; };
 		4C06670428FC7EC500038D2A /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 4C06670328FC7EC500038D2A /* Kingfisher */; };
 		4C06670628FCB08600038D2A /* ImageCarousel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C06670528FCB08600038D2A /* ImageCarousel.swift */; };
@@ -184,6 +189,11 @@
 		3A2B8B0A296A8982009CC16D /* en-US */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = "en-US"; path = "en-US.lproj/Localizable.stringsdict"; sourceTree = "<group>"; };
 		3A5C4575296A879E0032D398 /* es-419 */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = "es-419"; path = "es-419.lproj/Localizable.stringsdict"; sourceTree = "<group>"; };
 		3ACBCB77295FE5C70037388A /* TimeAgoTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeAgoTests.swift; sourceTree = "<group>"; };
+		46CB2E74297692BB003AF1DD /* NIP69.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NIP69.swift; sourceTree = "<group>"; };
+		46CB2E762976AC1F003AF1DD /* NIP69Badge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NIP69Badge.swift; sourceTree = "<group>"; };
+		46CB2E782977F2CF003AF1DD /* ZonefileParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZonefileParser.swift; sourceTree = "<group>"; };
+		46CB2E7A2977F49C003AF1DD /* zone-file-1.0.0.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "zone-file-1.0.0.js"; sourceTree = "<group>"; };
+		46CB2E7C2977F59C003AF1DD /* nip69.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = nip69.js; sourceTree = "<group>"; };
 		4C06670028FC7C5900038D2A /* RelayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RelayView.swift; sourceTree = "<group>"; };
 		4C06670528FCB08600038D2A /* ImageCarousel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageCarousel.swift; sourceTree = "<group>"; };
 		4C06670828FDE64700038D2A /* damus-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "damus-Bridging-Header.h"; sourceTree = "<group>"; };
@@ -584,6 +594,10 @@
 				4C3A1D3629637E0500558C0F /* PreviewCache.swift */,
 				64FBD06E296255C400D9D3B2 /* Theme.swift */,
 				4CB8838529656C8B00DC99E7 /* NIP05.swift */,
+				46CB2E74297692BB003AF1DD /* NIP69.swift */,
+				46CB2E782977F2CF003AF1DD /* ZonefileParser.swift */,
+				46CB2E7A2977F49C003AF1DD /* zone-file-1.0.0.js */,
+				46CB2E7C2977F59C003AF1DD /* nip69.js */,
 			);
 			path = Util;
 			sourceTree = "<group>";
@@ -616,6 +630,7 @@
 				4C3EA67E28FFC01D00C48A62 /* InvoiceView.swift */,
 				4CB8838A296F6E1E00DC99E7 /* NIP05Badge.swift */,
 				4CB8838C296F710400DC99E7 /* Reposted.swift */,
+				46CB2E762976AC1F003AF1DD /* NIP69Badge.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -822,7 +837,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				46CB2E7B2977F49C003AF1DD /* zone-file-1.0.0.js in Resources */,
 				4CE6DEEE27F7A08200C66700 /* Preview Assets.xcassets in Resources */,
+				46CB2E7D2977F59C003AF1DD /* nip69.js in Resources */,
 				4CE6DEEB27F7A08200C66700 /* Assets.xcassets in Resources */,
 				3A4325A82961E11400BFCD9D /* Localizable.stringsdict in Resources */,
 			);
@@ -879,6 +896,7 @@
 				4C477C9E282C3A4800033AA3 /* TipCounter.swift in Sources */,
 				647D9A8D2968520300A295DE /* SideMenuView.swift in Sources */,
 				4C0A3F91280F6528000448DE /* ChatView.swift in Sources */,
+				46CB2E792977F2CF003AF1DD /* ZonefileParser.swift in Sources */,
 				4C216F362870A9A700040376 /* InputDismissKeyboard.swift in Sources */,
 				4C216F382871EDE300040376 /* DirectMessageModel.swift in Sources */,
 				4C75EFA627FF87A20006080F /* Nostr.swift in Sources */,
@@ -927,6 +945,7 @@
 				4C3EA67928FF7ABF00C48A62 /* list.c in Sources */,
 				4C64987E286D082C00EAE2B3 /* DirectMessagesModel.swift in Sources */,
 				4C363A8828236948006E126D /* BlocksView.swift in Sources */,
+				46CB2E772976AC1F003AF1DD /* NIP69Badge.swift in Sources */,
 				4C06670628FCB08600038D2A /* ImageCarousel.swift in Sources */,
 				4C75EFAF28049D350006080F /* NostrFilter.swift in Sources */,
 				4C3EA64C28FF59AC00C48A62 /* bech32_util.c in Sources */,
@@ -961,6 +980,7 @@
 				4C3BEFDA281DCA1400B3DE84 /* LikeCounter.swift in Sources */,
 				4CB88389296AF99A00DC99E7 /* EventDetailBar.swift in Sources */,
 				4C3AC79B28306D7B00E1F516 /* Contacts.swift in Sources */,
+				46CB2E75297692BB003AF1DD /* NIP69.swift in Sources */,
 				4C3EA63D28FF52D600C48A62 /* bolt11.c in Sources */,
 				4CB55EF3295E5D59007FD187 /* RecommendedRelayView.swift in Sources */,
 				4C5F9118283D88E40052CD1C /* FollowingModel.swift in Sources */,
