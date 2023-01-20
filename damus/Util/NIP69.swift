@@ -20,7 +20,7 @@ struct NIP69 {
         if(url != nil) {
             self.url = url!
         } else {
-            self.url = URL(string: "\(nodeURL.absoluteString)v1/names/\(name)")!
+            self.url = URL(string: "\(nodeURL.absoluteString)/v1/names/\(name)")!
         }
     }
     
