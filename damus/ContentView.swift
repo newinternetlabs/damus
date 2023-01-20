@@ -103,7 +103,7 @@ struct ContentView: View {
             }
             .tabViewStyle(.page(indexDisplayMode: .never))
         }
-        .safeAreaInset(edge: .top) {
+        .safeAreaInset(edge: .top, spacing: 0) {
             VStack(spacing: 0) {
                 FiltersView
                     //.frame(maxWidth: 275)
@@ -113,7 +113,6 @@ struct ContentView: View {
             }
             .background(colorScheme == .dark ? Color.black : Color.white)
         }
-        .ignoresSafeArea(.keyboard)
     }
     
     func contentTimelineView(filter: (@escaping (NostrEvent) -> Bool)) -> some View {
@@ -180,16 +179,19 @@ struct ContentView: View {
                     .shadow(color: Color("DamusPurple"), radius: 2)
                 case .dms:
                     Text("DM", comment: "Toolbar label for DM view, which is the English abbreviation for Direct Message.")
+                        .bold()
                 case .notifications:
                     Text("Notifications", comment: "Toolbar label for Notifications view.")
+                        .bold()
                 case .search:
                     Text("Global", comment: "Toolbar label for Global view where posts from all connected relay servers appear.")
+                        .bold()
                 case .none:
                     Text("", comment: "Toolbar label for unknown views. This label would be displayed only if a new timeline view is added but a toolbar label was not explicitly assigned to it yet.")
                 }
             }
-             
         }
+        .ignoresSafeArea(.keyboard)
     }
     
     var MaybeSearchView: some View {
