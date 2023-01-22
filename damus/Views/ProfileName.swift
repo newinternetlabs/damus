@@ -127,6 +127,7 @@ struct EventProfileName: View {
     
     @State var display_name: String?
     @State var nip05: NIP05?
+    @State var nip69: NIP69?
     
     let size: EventViewKind
     
@@ -155,6 +156,10 @@ struct EventProfileName: View {
     var current_nip05: NIP05? {
         nip05 ?? damus_state.profiles.is_validated(pubkey)
     }
+    
+    var current_nip69: NIP69? {
+        nip69 ?? damus_state.profiles.is_has_name(pubkey)
+    }
    
     var body: some View {
         HStack(spacing: 2) {
@@ -162,10 +167,15 @@ struct EventProfileName: View {
                 Text(real_name)
                     .font(.body.weight(.bold))
                     .padding([.trailing], 2)
-                
-                Text("@" + String(display_name ?? Profile.displayName(profile: profile, pubkey: pubkey)))
-                    .foregroundColor(Color("DamusMediumGrey"))
-                    .font(eventviewsize_to_font(size))
+                if let nip69 = current_nip69 {
+                    Text("@" + String(nip69.name))
+                        .foregroundColor(.accentColor)
+                        .font(eventviewsize_to_font(size))
+                } else {
+                    Text("@" + String(display_name ?? Profile.displayName(profile: profile, pubkey: pubkey)))
+                        .foregroundColor(Color("DamusMediumGrey"))
+                        .font(eventviewsize_to_font(size))
+                }
             } else {
                 Text(String(display_name ?? Profile.displayName(profile: profile, pubkey: pubkey)))
                     .font(eventviewsize_to_font(size))
