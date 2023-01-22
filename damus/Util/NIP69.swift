@@ -10,18 +10,10 @@ import Foundation
 struct NIP69 {
     let name: String
     
-    let url: URL
+    static let DEFAULT_NODE_URL = URL(string: "https://nostrnames.org/api/names/")!
     
-    let nodeURL = URL(string: "https://stacks-node-api.mainnet.stacks.co")!
-    
-    init(name: String, url: URL? = nil) {
+    init(name: String) {
         self.name = name
-        
-        if(url != nil) {
-            self.url = url!
-        } else {
-            self.url = URL(string: "\(nodeURL.absoluteString)/v1/names/\(name)")!
-        }
     }
     
     static func parse(_ nip69: String) -> NIP69? {
@@ -63,10 +55,15 @@ func validate_nip69(pubkey: String, nip69_str: String) async -> NIP69? {
 //        return nil
 //    }
     print(nip69)
+    let userSettings = UserSettingsStore()
+    let userNodeURL = URL(string: userSettings.bns_node.self)
 
+    
+    let nodeURL: URL = userNodeURL == nil ? NIP69.DEFAULT_NODE_URL : userNodeURL!
  
-    print("nip69: fetching zonefile...")
-    guard let ret = try? await URLSession.shared.data(from: nip69.url) else {
+    let url = URL(string: "\(nodeURL.absoluteString)\(nip69.name)")!
+    print("nip69: fetching zonefile using \(url)")
+    guard let ret = try? await URLSession.shared.data(from: url) else {
         print("fetching zonefile for \(nip69.name) failed")
         return nil
     }

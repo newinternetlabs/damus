@@ -25,6 +25,12 @@ class UserSettingsStore: ObservableObject {
             UserDefaults.standard.set(left_handed, forKey: "left_handed")
         }
     }
+    
+    @Published var bns_node: String {
+        didSet {
+            UserDefaults.standard.set(bns_node, forKey: "bns_node")
+        }
+    }
 
     init() {
         if let defaultWalletName = UserDefaults.standard.string(forKey: "default_wallet"),
@@ -37,5 +43,7 @@ class UserSettingsStore: ObservableObject {
         show_wallet_selector = UserDefaults.standard.object(forKey: "show_wallet_selector") as? Bool ?? true
 
         left_handed = UserDefaults.standard.object(forKey: "left_handed") as? Bool ?? false
+        
+        bns_node = UserDefaults.standard.object(forKey: "bns_node") as? String ?? "https://stacks-node-api.mainnet.stacks.co"
     }
 }
