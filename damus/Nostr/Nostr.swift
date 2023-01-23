@@ -54,6 +54,10 @@ struct Profile: Codable {
         set(s) { value["website"] = s }
     }
     
+    var website_url: URL? {
+        return self.website.flatMap { URL(string: $0) }
+    }
+    
     var lud06: String? {
         get { return value["lud06"]; }
         set(s) { value["lud06"] = s }

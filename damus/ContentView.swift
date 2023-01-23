@@ -93,15 +93,23 @@ struct ContentView: View {
 
     var PostingTimelineView: some View {
         VStack {
-            TabView(selection: $filter_state) {
-                contentTimelineView(filter: FilterState.posts.filter)
-                    .tag(FilterState.posts)
-                    .id(FilterState.posts)
-                contentTimelineView(filter: FilterState.posts_and_replies.filter)
-                    .tag(FilterState.posts_and_replies)
-                    .id(FilterState.posts_and_replies)
+            ZStack {
+                TabView(selection: $filter_state) {
+                    contentTimelineView(filter: FilterState.posts.filter)
+                        .tag(FilterState.posts)
+                        .id(FilterState.posts)
+                    contentTimelineView(filter: FilterState.posts_and_replies.filter)
+                        .tag(FilterState.posts_and_replies)
+                        .id(FilterState.posts_and_replies)
+                }
+                .tabViewStyle(.page(indexDisplayMode: .never))
+                
+                if privkey != nil {
+                    PostButtonContainer(userSettings: user_settings) {
+                        self.active_sheet = .post
+                    }
+                }
             }
-            .tabViewStyle(.page(indexDisplayMode: .never))
         }
         .safeAreaInset(edge: .top, spacing: 0) {
             VStack(spacing: 0) {
@@ -119,11 +127,6 @@ struct ContentView: View {
         ZStack {
             if let damus = self.damus_state {
                 TimelineView(events: $home.events, loading: $home.loading, damus: damus, show_friend_icon: false, filter: filter)
-            }
-            if privkey != nil {
-                PostButtonContainer(userSettings: user_settings) {
-                    self.active_sheet = .post
-                }
             }
         }
     }
@@ -178,7 +181,7 @@ struct ContentView: View {
                     .frame(width:30,height:30)
                     .shadow(color: Color("DamusPurple"), radius: 2)
                 case .dms:
-                    Text("DM", comment: "Toolbar label for DM view, which is the English abbreviation for Direct Message.")
+                    Text("DMs", comment: "Toolbar label for DMs view, where DM is the English abbreviation for Direct Message.")
                         .bold()
                 case .notifications:
                     Text("Notifications", comment: "Toolbar label for Notifications view.")
