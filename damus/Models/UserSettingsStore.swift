@@ -44,6 +44,6 @@ class UserSettingsStore: ObservableObject {
 
         left_handed = UserDefaults.standard.object(forKey: "left_handed") as? Bool ?? false
         
-        bns_node = UserDefaults.standard.object(forKey: "bns_node") as? String ?? "https://stacks-node-api.mainnet.stacks.co"
+        bns_node = UserDefaults.standard.object(forKey: "bns_node") as? String ?? "https://nostrnames.org/api/names/"
     }
 }
