@@ -121,9 +121,9 @@ struct ConfigView: View {
                         .toggleStyle(.switch)
                 }
                 
-                Section(NSLocalizedString("NIP-69 Naming Node", comment: "Moves the post button to the left side of the screen")) {
+                Section(NSLocalizedString("NIP-69 Nostr Names Node", comment: "Moves the post button to the left side of the screen")) {
                     
-                    TextField(NSLocalizedString("https://nostrnames.org/api/names/", comment: "The BNS node name endpoint used for looking up NIP-69 names."), text: $user_settings.bns_node)
+                    TextField(NSLocalizedString("https://nostrnames.org/api/names/", comment: "The Bitcoin Name System node name endpoint used for looking up NIP-69 names."), text: $user_settings.bns_node)
                 }
 
                 Section(NSLocalizedString("Clear Cache", comment: "Section title for clearing cached data.")) {
