@@ -210,17 +210,17 @@
 		3ACB685B297633BC00C46468 /* es-419 */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "es-419"; path = "es-419.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
 		3ACB685E297633BC00C46468 /* es-419 */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "es-419"; path = "es-419.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		3ACBCB77295FE5C70037388A /* TimeAgoTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeAgoTests.swift; sourceTree = "<group>"; };
-		46CB2E74297692BB003AF1DD /* NIP69.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NIP69.swift; sourceTree = "<group>"; };
-		46CB2E762976AC1F003AF1DD /* NIP69Badge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NIP69Badge.swift; sourceTree = "<group>"; };
-		46CB2E782977F2CF003AF1DD /* ZonefileParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZonefileParser.swift; sourceTree = "<group>"; };
-		46CB2E7A2977F49C003AF1DD /* zone-file-1.0.0.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "zone-file-1.0.0.js"; sourceTree = "<group>"; };
-		46CB2E7C2977F59C003AF1DD /* nip69.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = nip69.js; sourceTree = "<group>"; };
 		3AEABD20297CCFA8003F2975 /* de-DE */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "de-DE"; path = "de-DE.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
 		3AEABD21297CCFA8003F2975 /* de-DE */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "de-DE"; path = "de-DE.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		3AEABD22297CCFA8003F2975 /* de-DE */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = "de-DE"; path = "de-DE.lproj/Localizable.stringsdict"; sourceTree = "<group>"; };
 		3AEB8003297CCEA800713A25 /* tr-TR */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "tr-TR"; path = "tr-TR.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
 		3AEB8004297CCEA800713A25 /* tr-TR */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "tr-TR"; path = "tr-TR.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		3AEB8005297CCEA900713A25 /* tr-TR */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = "tr-TR"; path = "tr-TR.lproj/Localizable.stringsdict"; sourceTree = "<group>"; };
+		46CB2E74297692BB003AF1DD /* NIP69.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NIP69.swift; sourceTree = "<group>"; };
+		46CB2E762976AC1F003AF1DD /* NIP69Badge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NIP69Badge.swift; sourceTree = "<group>"; };
+		46CB2E782977F2CF003AF1DD /* ZonefileParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZonefileParser.swift; sourceTree = "<group>"; };
+		46CB2E7A2977F49C003AF1DD /* zone-file-1.0.0.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "zone-file-1.0.0.js"; sourceTree = "<group>"; };
+		46CB2E7C2977F59C003AF1DD /* nip69.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = nip69.js; sourceTree = "<group>"; };
 		4C06670028FC7C5900038D2A /* RelayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RelayView.swift; sourceTree = "<group>"; };
 		4C06670528FCB08600038D2A /* ImageCarousel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageCarousel.swift; sourceTree = "<group>"; };
 		4C06670828FDE64700038D2A /* damus-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "damus-Bridging-Header.h"; sourceTree = "<group>"; };
@@ -908,7 +908,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-
 				46CB2E7B2977F49C003AF1DD /* zone-file-1.0.0.js in Resources */,
 				4CE6DEEE27F7A08200C66700 /* Preview Assets.xcassets in Resources */,
 				46CB2E7D2977F59C003AF1DD /* nip69.js in Resources */,
@@ -1299,7 +1298,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 9;
 				DEVELOPMENT_ASSET_PATHS = "\"damus/Preview Content\"";
-				DEVELOPMENT_TEAM = XK7H4JAB3D;
+				DEVELOPMENT_TEAM = PLSAH9K956;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = damus/Info.plist;
@@ -1320,7 +1319,7 @@
 					"$(PROJECT_DIR)",
 				);
 				MARKETING_VERSION = 1.0.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.jb55.damus2;
+				PRODUCT_BUNDLE_IDENTIFIER = com.newinternetlabs.damus2;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "damus-c/damus-Bridging-Header.h";
@@ -1340,7 +1339,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 9;
 				DEVELOPMENT_ASSET_PATHS = "\"damus/Preview Content\"";
-				DEVELOPMENT_TEAM = XK7H4JAB3D;
+				DEVELOPMENT_TEAM = PLSAH9K956;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = damus/Info.plist;
@@ -1361,7 +1360,7 @@
 					"$(PROJECT_DIR)",
 				);
 				MARKETING_VERSION = 1.0.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.jb55.damus2;
+				PRODUCT_BUNDLE_IDENTIFIER = com.newinternetlabs.damus2;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "damus-c/damus-Bridging-Header.h";
