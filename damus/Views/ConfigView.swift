@@ -159,7 +159,7 @@ struct ConfigView: View {
                     return
                 }
                 
-                if relay.starts(with: "wss://") == false {
+                if relay.starts(with: "wss://") == false && relay.starts(with: "ws://") == false {
                     relay = "wss://" + relay
                 }
                 
