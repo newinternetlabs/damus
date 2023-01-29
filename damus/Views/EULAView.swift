@@ -25,7 +25,7 @@ End User License Agreement
 
 ## Introduction
 
-This End User License Agreement ("EULA") is a legal agreement between you and New Internet Labs Limited. for the use of our mobile application Damus+. By installing, accessing, or using our application, you agree to be bound by the terms and conditions of this EULA.
+This End User License Agreement ("EULA") is a legal agreement between you and New Internet Labs Limited. for the use of our mobile application SixT9. By installing, accessing, or using our application, you agree to be bound by the terms and conditions of this EULA.
 
 ## Prohibited Content and Conduct
 
