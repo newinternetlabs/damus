@@ -91,6 +91,7 @@ struct EditButton: View {
                     RoundedRectangle(cornerRadius: 24)
                         .stroke(borderColor(), lineWidth: 1)
                 }
+                .minimumScaleFactor(0.5)
         }
     }
     
@@ -115,7 +116,7 @@ struct ProfileView: View {
     @State var is_zoomed: Bool = false
     @State var show_share_sheet: Bool = false
     @State var action_sheet_presented: Bool = false
-    @StateObject var user_settings = UserSettingsStore()
+    @EnvironmentObject var user_settings: UserSettingsStore
     
     @Environment(\.dismiss) var dismiss
     @Environment(\.colorScheme) var colorScheme
@@ -174,6 +175,24 @@ struct ProfileView: View {
             Image(systemName: "ellipsis.circle")
                 .profile_button_style(scheme: colorScheme)
         }
+        .confirmationDialog(NSLocalizedString("Actions", comment: "Title for confirmation dialog to either share, report, or block a profile."), isPresented: $action_sheet_presented) {
+            Button(NSLocalizedString("Share", comment: "Button to share the link to a profile.")) {
+                show_share_sheet = true
+            }
+
+            // Only allow reporting if logged in with private key and the currently viewed profile is not the logged in profile.
+            if profile.pubkey != damus_state.pubkey && damus_state.is_privkey_user {
+                Button(NSLocalizedString("Report", comment: "Button to report a profile."), role: .destructive) {
+                    let target: ReportTarget = .user(profile.pubkey)
+                    notify(.report, target)
+                }
+
+                Button(NSLocalizedString("Block", comment: "Button to block a profile."), role: .destructive) {
+                    notify(.block, profile.pubkey)
+                }
+            }
+        }
+
     }
     
     var ShareButton: some View {
@@ -372,20 +391,6 @@ struct ProfileView: View {
                 if let url = URL(string: "https://damus.io/" + npub) {
                     ShareSheet(activityItems: [url])
                 }
-            }
-        }
-        .confirmationDialog("Actions", isPresented: $action_sheet_presented) {
-            Button("Share") {
-                show_share_sheet = true
-            }
-            
-            Button("Report") {
-                let target: ReportTarget = .user(profile.pubkey)
-                notify(.report, target)
-            }
-            
-            Button("Block") {
-                notify(.block, profile.pubkey)
             }
         }
         .ignoresSafeArea()

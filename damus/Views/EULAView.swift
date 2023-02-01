@@ -8,15 +8,16 @@
 import SwiftUI
 
 struct EULAView: View {
+    var state: SetupState?
     @Environment(\.dismiss) var dismiss
-    @State var creating_account = false
+    @State var accepted = false
 
     var body: some View {
         ZStack {
             DamusGradient()
             
             ScrollView {
-                Text("EULA")
+                Text("EULA", comment: "Label indicating that the below text is the EULA, an acronym for End User License Agreement.")
                     .font(.title.bold())
                     .foregroundColor(.white)
                 
@@ -69,14 +70,20 @@ By using our Application, you signify your acceptance of this EULA. If you do no
 """))
                 .padding()
                 
-                NavigationLink(destination: CreateAccountView(), isActive: $creating_account) {
-                    EmptyView()
+                if state == .create_account {
+                    NavigationLink(destination: CreateAccountView(), isActive: $accepted) {
+                        EmptyView()
+                    }
+                } else {
+                    NavigationLink(destination: LoginView(), isActive: $accepted) {
+                        EmptyView()
+                    }
                 }
-                DamusWhiteButton("Accept") {
-                    creating_account = true
+                DamusWhiteButton(NSLocalizedString("Accept", comment: "Button to accept the end user license agreement before being allowed into the app.")) {
+                    accepted = true
                 }
-                
-                DamusWhiteButton("Reject") {
+
+                DamusWhiteButton(NSLocalizedString("Reject", comment: "Button to reject the end user license agreement, which disallows the user from being let into the app.")) {
                     dismiss()
                 }
             }
