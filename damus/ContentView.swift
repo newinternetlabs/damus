@@ -12,10 +12,10 @@ import Kingfisher
 var BOOTSTRAP_RELAYS = [
     "wss://relay.damus.io",
     "wss://eden.nostr.land",
-    "wss://nostr.fmt.wiz.biz",
-    "wss://relay.nostr.bg",
-    "wss://nostr.oxtr.dev",
     "wss://relay.snort.social",
+    "wss://nostr.orangepill.dev",
+    "wss://nos.lol",
+    "wss://relay.current.fyi",
     "wss://brb.io",
 ]
 
@@ -73,6 +73,7 @@ struct ContentView: View {
     @State var damus_state: DamusState? = nil
     @State var selected_timeline: Timeline? = .home
     @State var is_thread_open: Bool = false
+    @State var is_deleted_account: Bool = false
     @State var is_profile_open: Bool = false
     @State var event: NostrEvent? = nil
     @State var active_profile: String? = nil
@@ -119,9 +120,10 @@ struct ContentView: View {
         }
         .safeAreaInset(edge: .top, spacing: 0) {
             VStack(spacing: 0) {
-                FiltersView
-                    //.frame(maxWidth: 275)
-                    .padding()
+                CustomPicker(selection: $filter_state, content: {
+                    Text("Posts", comment: "Label for filter for seeing only posts (instead of posts and replies).").tag(FilterState.posts)
+                    Text("Posts & Replies", comment: "Label for filter for seeing posts and replies (instead of only posts).").tag(FilterState.posts_and_replies)
+                })
                 Divider()
                     .frame(height: 1)
             }
@@ -134,16 +136,6 @@ struct ContentView: View {
             if let damus = self.damus_state {
                 TimelineView(events: $home.events, loading: $home.loading, damus: damus, show_friend_icon: false, filter: filter)
             }
-        }
-    }
-    
-    var FiltersView: some View {
-        VStack{
-            Picker(NSLocalizedString("Filter State", comment: "Filter state for seeing either only posts, or posts & replies."), selection: $filter_state) {
-                Text("Posts", comment: "Label for filter for seeing only posts (instead of posts and replies).").tag(FilterState.posts)
-                Text("Posts & Replies", comment: "Label for filter for seeing posts and replies (instead of only posts).").tag(FilterState.posts_and_replies)
-            }
-            .pickerStyle(.segmented)
         }
     }
     
@@ -292,6 +284,7 @@ struct ContentView: View {
                     .padding([.bottom], 8)
             }
         }
+        .environmentObject(user_settings)
         .onAppear() {
             self.connect()
             //KingfisherManager.shared.cache.clearDiskCache()
@@ -302,7 +295,7 @@ struct ContentView: View {
             case .report(let target):
                 MaybeReportView(target: target)
             case .post:
-                PostView(replying_to: nil, references: [])
+                PostView(replying_to: nil, references: [], damus_state: damus_state!)
             case .reply(let event):
                 ReplyView(replying_to: event, damus: damus_state!)
             }
@@ -347,6 +340,9 @@ struct ContentView: View {
             self.active_sheet = .reply(ev)
         }
         .onReceive(handle_notify(.like)) { like in
+        }
+        .onReceive(handle_notify(.deleted_account)) { notif in
+            self.is_deleted_account = true
         }
         .onReceive(handle_notify(.report)) { notif in
             let target = notif.object as! ReportTarget
@@ -434,21 +430,32 @@ struct ContentView: View {
         .onReceive(handle_notify(.new_mutes)) { notif in
             home.filter_muted()
         }
-        .alert("User blocked", isPresented: $user_blocked_confirm, actions: {
-            Button("Thanks!") {
+        .alert(NSLocalizedString("Deleted Account", comment: "Alert message to indicate this is a deleted account"), isPresented: $is_deleted_account) {
+            Button(NSLocalizedString("Logout", comment: "Button to close the alert that informs that the current account has been deleted.")) {
+                is_deleted_account = false
+                notify(.logout, ())
+            }
+        }
+        .alert(NSLocalizedString("User blocked", comment: "Alert message to indicate the user has been blocked"), isPresented: $user_blocked_confirm, actions: {
+            Button(NSLocalizedString("Thanks!", comment: "Button to close out of alert that informs that the action to block a user was successful.")) {
                 user_blocked_confirm = false
             }
         }, message: {
             if let pubkey = self.blocking {
                 let profile = damus_state!.profiles.lookup(id: pubkey)
                 let name = Profile.displayName(profile: profile, pubkey: pubkey)
-                Text("\(name) has been blocked")
+                Text("\(name) has been blocked", comment: "Alert message that informs a user was blocked.")
             } else {
-                Text("User has been blocked")
+                Text("User has been blocked", comment: "Alert message that informs a user was blocked.")
             }
         })
-        .alert("Create new mutelist", isPresented: $confirm_overwrite_mutelist, actions: {
-            Button("Yes, Overwrite") {
+        .alert(NSLocalizedString("Create new mutelist", comment: "Title of alert prompting the user to create a new mutelist."), isPresented: $confirm_overwrite_mutelist, actions: {
+            Button(NSLocalizedString("Cancel", comment: "Button to cancel out of alert that creates a new mutelist.")) {
+                confirm_overwrite_mutelist = false
+                confirm_block = false
+            }
+
+            Button(NSLocalizedString("Yes, Overwrite", comment: "Text of button that confirms to overwrite the existing mutelist.")) {
                 guard let ds = damus_state else {
                     return
                 }
@@ -472,20 +479,18 @@ struct ContentView: View {
                 confirm_block = false
                 user_blocked_confirm = true
             }
-            
-            Button("Cancel") {
-                confirm_overwrite_mutelist = false
+        }, message: {
+            Text("No block list found, create a new one? This will overwrite any previous block lists.", comment: "Alert message prompt that asks if the user wants to create a new block list, overwriting previous block lists.")
+        })
+        .alert(NSLocalizedString("Block User", comment: "Title of alert for blocking a user."), isPresented: $confirm_block, actions: {
+            Button(NSLocalizedString("Cancel", comment: "Alert button to cancel out of alert for blocking a user."), role: .cancel) {
                 confirm_block = false
             }
-        }, message: {
-            Text("No block list found, create a new one? This will overwrite any previous block lists.")
-        })
-        .alert("Block User", isPresented: $confirm_block, actions: {
-            Button("Block") {
+            Button(NSLocalizedString("Block", comment: "Alert button to block a user."), role: .destructive) {
                 guard let ds = damus_state else {
                     return
                 }
-                
+
                 if ds.contacts.mutelist == nil {
                     confirm_overwrite_mutelist = true
                 } else {
@@ -495,7 +500,7 @@ struct ContentView: View {
                     guard let pubkey = blocking else {
                         return
                     }
-                            
+
                     guard let ev = create_or_update_mutelist(keypair: keypair, mprev: ds.contacts.mutelist, to_add: pubkey) else {
                         return
                     }
@@ -503,17 +508,13 @@ struct ContentView: View {
                     ds.pool.send(.event(ev))
                 }
             }
-            
-            Button("Cancel") {
-                confirm_block = false
-            }
         }, message: {
             if let pubkey = blocking {
                 let profile = damus_state?.profiles.lookup(id: pubkey)
                 let name = Profile.displayName(profile: profile, pubkey: pubkey)
-                Text("Block \(name)?")
+                Text("Block \(name)?", comment: "Alert message prompt to ask if a user should be blocked.")
             } else {
-                Text("Could not find user to block...")
+                Text("Could not find user to block...", comment: "Alert message to indicate that the blocked user could not be found.")
             }
         })
     }

@@ -35,7 +35,7 @@ struct EventView: View {
 
     @EnvironmentObject var action_bar: ActionBarModel
 
-    init(event: NostrEvent, has_action_bar: Bool, damus: DamusState) {
+    init(damus: DamusState, event: NostrEvent, has_action_bar: Bool) {
         self.event = event
         self.has_action_bar = has_action_bar
         self.damus = damus
@@ -129,7 +129,7 @@ struct EventView: View {
         .id(event.id)
         .frame(maxWidth: .infinity, minHeight: PFP_SIZE)
         .padding([.bottom], 2)
-        .event_context_menu(event, pubkey: pubkey, privkey: damus.keypair.privkey)
+        .event_context_menu(event, keypair: damus.keypair, target_pubkey: pubkey)
     }
 }
 
@@ -171,9 +171,9 @@ extension View {
         }
     }
     
-    func event_context_menu(_ event: NostrEvent, pubkey: String, privkey: String?) -> some View {
+    func event_context_menu(_ event: NostrEvent, keypair: Keypair, target_pubkey: String) -> some View {
         return self.contextMenu {
-            EventMenuContext(event: event, privkey: privkey, pubkey: pubkey)
+            EventMenuContext(event: event, keypair: keypair, target_pubkey: target_pubkey)
         }
 
     }
@@ -222,9 +222,9 @@ struct EventView_Previews: PreviewProvider {
             
              */
             EventView(
+                damus: test_damus_state(),
                 event: test_event,
-                has_action_bar: true,
-                damus: test_damus_state()
+                has_action_bar: true
             )
         }
         .padding()

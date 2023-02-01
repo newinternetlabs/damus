@@ -372,7 +372,7 @@ class HomeModel: ObservableObject {
     }
     
     func handle_metadata_event(_ ev: NostrEvent) {
-        process_metadata_event(profiles: damus_state.profiles, ev: ev)
+        process_metadata_event(our_pubkey: damus_state.pubkey, profiles: damus_state.profiles, ev: ev)
     }
 
     func get_last_event_of_kind(relay_id: String, kind: Int) -> NostrEvent? {
@@ -410,15 +410,8 @@ class HomeModel: ObservableObject {
         return ok
     }
 
-    func should_hide_event(_ ev: NostrEvent) -> Bool {
-        if damus_state.contacts.is_muted(ev.pubkey) {
-            return true
-        }
-        return !ev.should_show_event
-    }
-
     func handle_text_event(sub_id: String, _ ev: NostrEvent) {
-        if should_hide_event(ev) {
+        if should_hide_event(contacts: damus_state.contacts, ev: ev) {
             return
         }
 
@@ -537,8 +530,15 @@ func print_filters(relay_id: String?, filters groups: [[NostrFilter]]) {
     print("-----")
 }
 
-func process_metadata_event(profiles: Profiles, ev: NostrEvent) {
+func process_metadata_event(our_pubkey: String, profiles: Profiles, ev: NostrEvent) {
     guard let profile: Profile = decode_data(Data(ev.content.utf8)) else {
+        return
+    }
+    
+    if our_pubkey == ev.pubkey && (profile.deleted ?? false) {
+        DispatchQueue.main.async {
+            notify(.deleted_account, ())
+        }
         return
     }
 
@@ -742,4 +742,12 @@ func event_has_our_pubkey(_ ev: NostrEvent, our_pubkey: String) -> Bool {
     }
     
     return false
+}
+
+
+func should_hide_event(contacts: Contacts, ev: NostrEvent) -> Bool {
+    if contacts.is_muted(ev.pubkey) {
+        return true
+    }
+    return !ev.should_show_event
 }

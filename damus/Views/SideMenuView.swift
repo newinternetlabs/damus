@@ -12,7 +12,9 @@ struct SideMenuView: View {
     @Binding var isSidebarVisible: Bool
 
     @State var confirm_logout: Bool = false
-    @StateObject var user_settings = UserSettingsStore()
+    @EnvironmentObject var user_settings: UserSettingsStore
+    
+    @State private var showQRCode = false
     
     @Environment(\.colorScheme) var colorScheme
     
@@ -113,6 +115,12 @@ struct SideMenuView: View {
                             .foregroundColor(textColor())
                     }
                     
+                    NavigationLink(destination: RelayConfigView(state: damus_state)) {
+                        Label(NSLocalizedString("Relays", comment: "Sidebar menu label for Relays view."), systemImage: "network")
+                            .font(.title2)
+                            .foregroundColor(textColor())
+                    }
+                    
                     NavigationLink(destination: ConfigView(state: damus_state).environmentObject(user_settings)) {
                         Label(NSLocalizedString("Settings", comment: "Sidebar menu label for accessing the app settings"), systemImage: "gear")
                             .font(.title2)
@@ -124,18 +132,33 @@ struct SideMenuView: View {
                     
                     Spacer()
                     
-                    Button(action: {
-                        //ConfigView(state: damus_state)
-                        if damus_state.keypair.privkey == nil {
-                            notify(.logout, ())
-                        } else {
-                            confirm_logout = true
+                    HStack(alignment: .center) {
+                        Button(action: {
+                            //ConfigView(state: damus_state)
+                            if damus_state.keypair.privkey == nil {
+                                notify(.logout, ())
+                            } else {
+                                confirm_logout = true
+                            }
+                        }, label: {
+                            Label(NSLocalizedString("Sign out", comment: "Sidebar menu label to sign out of the account."), systemImage: "pip.exit")
+                                .font(.title3)
+                                .foregroundColor(textColor())
+                        })
+                        
+                        Spacer()
+                        
+                        Button(action: {
+                            showQRCode.toggle()
+                        }, label: {
+                            Label(NSLocalizedString("", comment: "Sidebar menu label for accessing QRCode view"), systemImage: "qrcode")
+                                .font(.title)
+                                .foregroundColor(textColor())
+                                .padding(.trailing, 20)
+                        }).fullScreenCover(isPresented: $showQRCode) {
+                            QRCodeView(damus_state: damus_state)
                         }
-                    }, label: {
-                        Label(NSLocalizedString("Sign out", comment: "Sidebar menu label to sign out of the account."), systemImage: "pip.exit")
-                            .font(.title3)
-                            .foregroundColor(textColor())
-                    })
+                    }
                 }
                 .padding(.top, 60)
                 .padding(.bottom, 40)
@@ -148,10 +171,10 @@ struct SideMenuView: View {
                 isSidebarVisible.toggle()
             }
             .alert("Logout", isPresented: $confirm_logout) {
-                Button(NSLocalizedString("Cancel", comment: "Cancel out of logging out the user.")) {
+                Button(NSLocalizedString("Cancel", comment: "Cancel out of logging out the user."), role: .cancel) {
                     confirm_logout = false
                 }
-                Button(NSLocalizedString("Logout", comment: "Button for logging out the user.")) {
+                Button(NSLocalizedString("Logout", comment: "Button for logging out the user."), role: .destructive) {
                     notify(.logout, ())
                 }
             } message: {
