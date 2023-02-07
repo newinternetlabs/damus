@@ -13,6 +13,7 @@ class Profiles {
     var profiles: [String: TimestampedProfile] = [:]
     var validated: [String: NIP05] = [:]
     var has_name: [String: NIP69] = [:]
+    var zappers: [String: String] = [:]
     
     func is_validated(_ pk: String) -> NIP05? {
         return validated[pk]
@@ -20,6 +21,13 @@ class Profiles {
     
     func is_has_name(_ pk: String) -> NIP69? {
         return has_name[pk]
+    }
+        
+    func lookup_zapper(pubkey: String) -> String? {
+        if let zapper = zappers[pubkey] {
+            return zapper
+        }
+        return nil
     }
     
     func add(id: String, profile: TimestampedProfile) {
