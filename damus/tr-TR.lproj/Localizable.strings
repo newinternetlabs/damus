@@ -16,8 +16,8 @@
 /* Abbreviated version of a nostr public key. */
 "%@" = "%@";
 
-/* Sentence composed of 2 variables to describe how many zap payments there are on a post. In source English, the first variable is the number of zap payments, and the second variable is 'Zap' or 'Zaps'.
-Sentence composed of 2 variables to describe how many profiles a user is following. In source English, the first variable is the number of profiles being followed, and the second variable is 'Following'. */
+/* Sentence composed of 2 variables to describe how many reposts. In source English, the first variable is the number of reposts, and the second variable is 'Repost' or 'Reposts'.
+Sentence composed of 2 variables to describe how many relay servers a user is connected. In source English, the first variable is the number of relay servers, and the second variable is 'Relay' or 'Relays'. */
 "%@ %@" = "%@ %@";
 
 /* Explanation of what is done to keep personally identifiable information private. There is a heading that precedes this explanation which is a variable to this string. */
@@ -29,8 +29,8 @@ Sentence composed of 2 variables to describe how many profiles a user is followi
 /* Explanation of what can be done by users to earn money. There is a heading that precedes this explanation which is a variable to this string. */
 "%@. Tip your friend's posts and stack sats with Bitcoin⚡️, the native currency of the internet." = "%@. Arkadaşlarınızın gönderilerine bahşiş verin ve internetin yerel para birimi olan Bitcoin⚡️ ile sats biriktirin.";
 
-/* Number of zap payments on a post.
-Number of profiles a user is following. */
+/* Number of reposts.
+Number of relay servers a user is connected. */
 "%lld" = "%lld";
 
 /* Fraction of how many of the user's relay servers that are operational. */
@@ -39,7 +39,7 @@ Number of profiles a user is following. */
 /* Placeholder for event mention. */
 "< e >" = "< e >";
 
-/* No comment provided by engineer. */
+/* Text indicating the zap amount. i.e. number of satoshis that were tipped to a user */
 "⚡️ %@" = "⚡️ %@";
 
 /* Label to prompt for about text entry for user to describe about themself. */
@@ -102,9 +102,6 @@ Number of profiles a user is following. */
 
 /* Dropdown option label for Lightning wallet, Cash App. */
 "Cash App" = "Cash App";
-
-/* Navigation bar title for Chatroom view. */
-"Chat" = "Sohbet";
 
 /* Button for clearing cached data. */
 "Clear" = "Temizle";
@@ -270,7 +267,7 @@ Part of a larger sentence to describe how many profiles a user is following. */
 /* Indicates that there are no notes in the timeline to view. */
 "Nothing to see here. Check back later!" = "Görülecek bir şey yok. Daha sonra tekrar kontrol et!";
 
-/* Navigation title for notifications. */
+/* Toolbar label for Notifications view. */
 "Notifications" = "Bildirimler";
 
 /* String indicating that a given timestamp just occurred */
@@ -330,11 +327,11 @@ Part of a larger sentence to describe how many profiles a user is following. */
 /* Section title for recommend relay servers that could be added as part of configuration */
 "Recommended Relays" = "Önerilen Röleler";
 
-/* Text field for relay server. Used for testing purposes. */
+/* Label to display relay address.
+   Text field for relay server. Used for testing purposes. */
 "Relay" = "Röle";
 
-/* Sidebar menu label for Relay servers view
-   Sidebar menu label for Relays view. */
+/* Sidebar menu label for Relays view. */
 "Relays" = "Röleler";
 
 /* Label to indicate that the user is replying to themself. */
@@ -393,7 +390,8 @@ Part of a larger sentence to describe how many profiles a user is following. */
    Sidebar menu label for accessing the app settings */
 "Settings" = "Ayarlar";
 
-/* Button to share an image.
+/* Button to share a post
+   Button to share an image.
    Button to share the link to a profile. */
 "Share" = "Paylaş";
 
@@ -422,8 +420,7 @@ Part of a larger sentence to describe how many profiles a user is following. */
 /* Label to describe that a private key is the user's secret account key and what they should do with it. */
 "This is your secret account key. You need this to access your account. Don't share this with anyone! Save it in a password manager and keep it safe!" = "Bu sizin gizli hesap anahtarınızdır. Hesabınıza erişmek için buna ihtiyacınız var. Bunu kimseyle paylaşmayın! Bir şifre yöneticisine kaydedin ve güvende tutun!";
 
-/* Navigation bar title for note thread.
-   Navigation bar title for threaded event detail view. */
+/* Navigation bar title for note thread. */
 "Thread" = "Konu";
 
 /* Text box prompt to ask user to type their post. */

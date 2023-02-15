@@ -28,13 +28,14 @@ struct EventActionBar: View {
     @State var sheet: ActionBarSheet? = nil
     @State var confirm_boost: Bool = false
     @State var show_share_sheet: Bool = false
-    @StateObject var bar: ActionBarModel
     
-    init(damus_state: DamusState, event: NostrEvent, bar: ActionBarModel, test_lnurl: String? = nil) {
+    @ObservedObject var bar: ActionBarModel
+    
+    init(damus_state: DamusState, event: NostrEvent, bar: ActionBarModel? = nil, test_lnurl: String? = nil) {
         self.damus_state = damus_state
         self.event = event
         self.test_lnurl = test_lnurl
-        _bar = StateObject.init(wrappedValue: bar)
+        _bar = ObservedObject(wrappedValue: bar ?? make_actionbar_model(ev: event.id, damus: damus_state))
     }
     
     var lnurl: String? {
@@ -109,6 +110,11 @@ struct EventActionBar: View {
             }
         } message: {
             Text("Are you sure you want to repost this?", comment: "Alert message to ask if user wants to repost a post.")
+        }
+        .onReceive(handle_notify(.update_stats)) { n in
+            let target = n.object as! String
+            guard target == self.event.id else { return }
+            self.bar.update(damus: self.damus_state, evid: target)
         }
         .onReceive(handle_notify(.liked)) { n in
             let liked = n.object as! Counted
