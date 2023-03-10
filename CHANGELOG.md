@@ -1,3 +1,143 @@
+## [1.2.0-4] - 2023-03-05
+
+### Added
+
+- Add ellipsis button to notes (ericholguin)
+
+
+### Changed
+
+- Immediately search for events and profiles (William Casarin)
+- Use long-press for custom zaps (William Casarin)
+- Make shaka animation smoother (Swift)
+
+
+### Fixed
+
+- Fixed hit detection bugs on profile page (OlegAba)
+- Fix disappearing text on Thread view (Bryan Montz)
+- Render links in notification summaries (Joel Klabo)
+- Don't show notifications from ourselves (William Casarin)
+- Fix issue where navbar back button would show the wrong text (Jack Chakany)
+- Fix case sensitivity when searching hashtags (randymcmillan)
+- Fix issue where opening reposts shows json (William Casarin)
+
+
+[1.2.0-4]: https://github.com/damus-io/damus/releases/tag/v1.2.0-4
+
+## [1.2.0-3] - 2023-03-04
+
+### Added
+
+- Add additional info to recommended relay view (ericholguin)
+- Add shaka animation (Swift)
+- Add option to disable image animation (OlegAba)
+- Add additional warning when deleting account (ericholguin)
+- Threads now load instantly and are cached (William Casarin)
+
+
+### Fixed
+
+- Wrap long profile display names (OlegAba)
+- Fixed weird scaling on profile pictures (OlegAba)
+- Fixed width of copy pubkey on profile page (Joel Klabo)
+- Make damus purple use more consistent in mentions (Joel Klabo)
+
+
+
+[1.2.0-3]: https://github.com/damus-io/damus/releases/tag/v1.2.0-3
+
+## [1.1.0-10] - 2023-03-01
+
+### Added
+
+- Truncate large posts and add a show more button (OlegAba)
+- Private Zaps (William Casarin)
+
+
+### Fixed
+
+- Fix default zap amount setting not getting updated (William Casarin)
+- Fix issue where keyboard covers custom zap comment (William Casarin)
+
+
+[1.1.0-10]: https://github.com/damus-io/damus/releases/tag/v1.1.0-10
+
+## [1.1.0-9] - 2023-02-26
+
+### Added
+
+- Customized zaps (William Casarin)
+- Add new Notifications View (William Casarin)
+- Bookmarking (Joel Klabo)
+
+### Changed
+
+- No more inline npubs when tagging users (Swift)
+
+
+### Fixed
+
+- Fix alignment of side menu labels (Joel Klabo)
+- Fix duplicated participants in reply-to view (Joel Klabo)
+- Load missing profiles in Zaps view (William Casarin)
+- Fix memory leak with inline videos (William Casarin)
+- Eliminate popping when scrolling (William Casarin)
+
+
+[1.1.0-9]: https://github.com/damus-io/damus/releases/tag/v1.1.0-9
+
+## [1.1.0-3] - 2023-02-20
+
+### Added
+
+- Add a "load more" button instead of always inserting events in timelines (William Casarin)
+- Added the ability to select text on posts (OlegAba)
+- Added Posts or Post & Replies selector to Profile (ericholguin)
+- Improved profile navbar (OlegAba)
+
+
+### Changed
+
+- Rename global feed to universe (William Casarin)
+- Improve look of post view (ericholguin)
+- Added a 20MB content length limit for all image files (OlegAba)
+- Improved EventActionBar button spacing (Bryan Montz)
+- Polished profile key copy buttons, added animation (Bryan Montz)
+- Format large numbers of action bar actions (Joel Klabo)
+- Improved blur on images, especially in dark mode (Bryan Montz)
+
+
+### Fixed
+
+- Remove trailing slash when adding a relay (middlingphys)
+- Scroll to top of events instead of the bottom (OlegAba)
+- Fix lag on startup when you have lots of DMs (William Casarin)
+- Fix an issues where dm notifications appear without any new events (William Casarin)
+- Fix some hangs when scrolling by images (OlegAba)
+- Force default zap amount text field to accept only numbers (Terry Yiu)
+
+
+
+[1.1.0-3]: https://github.com/damus-io/damus/releases/tag/v1.1.0-3
+
+## [1.1.0-2] - 2023-02-14
+
+### Added
+
+- Save drafts to posts, replies and DMs (Terry Yiu)
+
+### Fixed
+
+- Ensure stats get updated in realtime on action bars (William Casarin)
+- Fix reposts not getting counted properly (William Casarin)
+- Fix a bug where zaps on other people's posts weren't showing (William Casarin)
+- Fix punctuation getting included in some urls (Gert Goet)
+- Improve language detection (Terry Yiu)
+- Fix some animated image crashes (William Casarin)
+
+
+[1.1.0-2]: https://github.com/damus-io/damus/releases/tag/v1.1.0-2
 ## [1.0.0-15] - 2023-02-10
 
 ### Added
@@ -558,4 +698,5 @@
 
 
 [0.1.2]: https://github.com/damus-io/damus/releases/tag/v0.1.2
+
 

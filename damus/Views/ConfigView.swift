@@ -8,11 +8,14 @@ import AVFoundation
 import Kingfisher
 import SwiftUI
 import LocalAuthentication
+import Combine
 
 struct ConfigView: View {
     let state: DamusState
+    @Environment(\.colorScheme) var colorScheme
     @Environment(\.dismiss) var dismiss
     @State var confirm_logout: Bool = false
+    @State var delete_account_warning: Bool = false
     @State var confirm_delete_account: Bool = false
     @State var show_privkey: Bool = false
     @State var has_authenticated_locally: Bool = false
@@ -33,6 +36,10 @@ struct ConfigView: View {
         _default_zap_amount = State(initialValue: zap_amt)
         _privkey = State(initialValue: self.state.keypair.privkey_bech32 ?? "")
         _settings = ObservedObject(initialValue: state.settings)
+    }
+    
+    func textColor() -> Color {
+        colorScheme == .light ? Color("DamusBlack") : Color("DamusWhite")
     }
 
     func authenticateLocally(completion: @escaping (Bool) -> Void) {
@@ -128,9 +135,16 @@ struct ConfigView: View {
                     }
                 }
                 
-                
                 Section(NSLocalizedString("Default Zap Amount in sats", comment: "Section title for zap configuration")) {
-                    TextField("1000", text: $default_zap_amount)
+                    TextField(String("1000"), text: $default_zap_amount)
+                        .keyboardType(.numberPad)
+                        .onReceive(Just(default_zap_amount)) { newValue in
+                            
+                            if let parsed = handle_string_amount(new_value: newValue) {
+                                self.default_zap_amount = String(parsed)
+                                set_default_zap_amount(pubkey: self.state.pubkey, amount: parsed)
+                            }
+                        }
                 }
 
                 Section(NSLocalizedString("Translations", comment: "Section title for selecting the translation service.")) {
@@ -190,37 +204,58 @@ struct ConfigView: View {
                     TextField(NSLocalizedString("https://nostrnames.org/api/names/", comment: "The Bitcoin Name System node name endpoint used for looking up NIP-69 names."), text: $settings.bns_node)
                 }
 
-                Section(NSLocalizedString("Clear Cache", comment: "Section title for clearing cached data.")) {
-                    Button(NSLocalizedString("Clear", comment: "Button for clearing cached data.")) {
-                        KingfisherManager.shared.cache.clearMemoryCache()
-                        KingfisherManager.shared.cache.clearDiskCache()
-                        KingfisherManager.shared.cache.cleanExpiredDiskCache()
+                Section(NSLocalizedString("Images", comment: "Section title for images configuration.")) {
+                    Toggle(NSLocalizedString("Disable animations", comment: "Button to disable image animation"), isOn: $settings.disable_animation)
+                        .toggleStyle(.switch)
+                        .onChange(of: settings.disable_animation) { _ in
+                            clear_kingfisher_cache()
+                        }
+
+                    Button(NSLocalizedString("Clear Cache", comment: "Button to clear image cache.")) {
+                        clear_kingfisher_cache()
                     }
+                }
+                
+                Section(NSLocalizedString("Sign Out", comment: "Section title for signing out")) {
+                    Button(action: {
+                        if state.keypair.privkey == nil {
+                            notify(.logout, ())
+                        } else {
+                            confirm_logout = true
+                        }
+                    }, label: {
+                        Label(NSLocalizedString("Sign out", comment: "Sidebar menu label to sign out of the account."), systemImage: "pip.exit")
+                            .foregroundColor(textColor())
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                    })
                 }
 
                 if state.is_privkey_user {
-                    Section(NSLocalizedString("Delete", comment: "Section title for deleting the user")) {
+                    Section(NSLocalizedString("Permanently Delete Account", comment: "Section title for deleting the user")) {
                         Button(NSLocalizedString("Delete Account", comment: "Button to delete the user's account."), role: .destructive) {
-                            confirm_delete_account = true
+                            delete_account_warning = true
                         }
                     }
                 }
 
-                let bundleShortVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as! String
-                let bundleVersion = Bundle.main.infoDictionary?["CFBundleVersion"] as! String
-                Section(NSLocalizedString("Version", comment: "Section title for displaying the version number of the Damus app.")) {
-                    Text("\(bundleShortVersion) (\(bundleVersion))", comment: "Text indicating which version of the Damus app is running. Should typically not need to be translated.")
+                if let bundleShortVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"], let bundleVersion = Bundle.main.infoDictionary?["CFBundleVersion"] {
+                    Section(NSLocalizedString("Version", comment: "Section title for displaying the version number of the Damus app.")) {
+                        Text(verbatim: "\(bundleShortVersion) (\(bundleVersion))")
+                    }
                 }
             }
         }
-        .onChange(of: default_zap_amount) { val in
-            guard let amt = Int(val) else {
-                return
-            }
-            set_default_zap_amount(pubkey: state.pubkey, amount: amt)
-        }
         .navigationTitle(NSLocalizedString("Settings", comment: "Navigation title for Settings view."))
         .navigationBarTitleDisplayMode(.large)
+        .alert(NSLocalizedString("WARNING:\n\nTHIS WILL SIGN AN EVENT THAT DELETES THIS ACCOUNT.\n\nYOU WILL NO LONGER BE ABLE TO LOG INTO DAMUS USING THIS ACCOUNT KEY.\n\n ARE YOU SURE YOU WANT TO CONTINUE?", comment: "Alert for deleting the users account."), isPresented: $delete_account_warning) {
+
+            Button(NSLocalizedString("Cancel", comment: "Cancel deleting the user."), role: .cancel) {
+                delete_account_warning = false
+            }
+            Button(NSLocalizedString("Continue", comment: "Continue with deleting the user.")) {
+                confirm_delete_account = true
+            }
+        }
         .alert(NSLocalizedString("Permanently Delete Account", comment: "Alert for deleting the users account."), isPresented: $confirm_delete_account) {
             TextField(NSLocalizedString("Type DELETE to delete", comment: "Text field prompt asking user to type the word DELETE to confirm that they want to proceed with deleting their account. The all caps lock DELETE word should not be translated. Everything else should."), text: $delete_text)
             Button(NSLocalizedString("Cancel", comment: "Cancel deleting the user."), role: .cancel) {
@@ -337,4 +372,26 @@ struct ConfigView_Previews: PreviewProvider {
             ConfigView(state: test_damus_state())
         }
     }
+}
+
+
+func handle_string_amount(new_value: String) -> Int? {
+    let digits = Set("0123456789")
+    let filtered = new_value.filter { digits.contains($0) }
+
+    if filtered == "" {
+        return nil
+    }
+
+    guard let amt = Int(filtered) else {
+        return nil
+    }
+    
+    return amt
+}
+
+func clear_kingfisher_cache() -> Void {
+    KingfisherManager.shared.cache.clearMemoryCache()
+    KingfisherManager.shared.cache.clearDiskCache()
+    KingfisherManager.shared.cache.cleanExpiredDiskCache()
 }

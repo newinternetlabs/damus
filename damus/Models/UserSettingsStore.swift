@@ -7,6 +7,7 @@
 
 import Foundation
 import Vault
+import UIKit
 
 func should_show_wallet_selector(_ pubkey: String) -> Bool {
     return UserDefaults.standard.object(forKey: "show_wallet_selector") as? Bool ?? true
@@ -34,6 +35,10 @@ func get_default_zap_amount(pubkey: String) -> Int? {
     return amt
 }
 
+func should_disable_image_animation() -> Bool {
+    return (UserDefaults.standard.object(forKey: "disable_animation") as? Bool)
+            ?? UIAccessibility.isReduceMotionEnabled
+ }
 
 func get_default_wallet(_ pubkey: String) -> Wallet {
     if let defaultWalletName = UserDefaults.standard.string(forKey: "default_wallet"),
@@ -165,6 +170,12 @@ class UserSettingsStore: ObservableObject {
             }
         }
     }
+    
+    @Published var disable_animation: Bool {
+        didSet {
+            UserDefaults.standard.set(disable_animation, forKey: "disable_animation")
+        }
+     }
 
     init() {
         // TODO: pubkey-scoped settings
@@ -175,6 +186,7 @@ class UserSettingsStore: ObservableObject {
         left_handed = UserDefaults.standard.object(forKey: "left_handed") as? Bool ?? false
         
         bns_node = UserDefaults.standard.object(forKey: "bns_node") as? String ?? "https://nostrnames.org/api/names/"
+        disable_animation = should_disable_image_animation()
 
         // Note from @tyiu:
         // Default translation service is disabled by default for now until we gain some confidence that it is working well in production.
