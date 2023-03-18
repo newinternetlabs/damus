@@ -147,52 +147,7 @@ struct ConfigView: View {
                         }
                 }
 
-                Section(NSLocalizedString("Translations", comment: "Section title for selecting the translation service.")) {
-                    Picker(NSLocalizedString("Service", comment: "Prompt selection of translation service provider."), selection: $settings.translation_service) {
-                        ForEach(TranslationService.allCases, id: \.self) { server in
-                            Text(server.model.displayName)
-                                .tag(server.model.tag)
-                        }
-                    }
-
-                    if settings.translation_service == .libretranslate {
-                        Picker(NSLocalizedString("Server", comment: "Prompt selection of LibreTranslate server to perform machine translations on notes"), selection: $settings.libretranslate_server) {
-                            ForEach(LibreTranslateServer.allCases, id: \.self) { server in
-                                Text(server.model.displayName)
-                                    .tag(server.model.tag)
-                            }
-                        }
-
-                        if settings.libretranslate_server == .custom {
-                            TextField(NSLocalizedString("URL", comment: "Example URL to LibreTranslate server"), text: $settings.libretranslate_url)
-                                .disableAutocorrection(true)
-                                .autocapitalization(UITextAutocapitalizationType.none)
-                        }
-
-                        SecureField(NSLocalizedString("API Key (optional)", comment: "Prompt for optional entry of API Key to use translation server."), text: $settings.libretranslate_api_key)
-                            .disableAutocorrection(true)
-                            .disabled(settings.translation_service != .libretranslate)
-                            .autocapitalization(UITextAutocapitalizationType.none)
-                    }
-
-                    if settings.translation_service == .deepl {
-                        Picker(NSLocalizedString("Plan", comment: "Prompt selection of DeepL subscription plan to perform machine translations on notes"), selection: $settings.deepl_plan) {
-                            ForEach(DeepLPlan.allCases, id: \.self) { server in
-                                Text(server.model.displayName)
-                                    .tag(server.model.tag)
-                            }
-                        }
-
-                        SecureField(NSLocalizedString("API Key (required)", comment: "Prompt for required entry of API Key to use translation server."), text: $settings.deepl_api_key)
-                            .disableAutocorrection(true)
-                            .disabled(settings.translation_service != .deepl)
-                            .autocapitalization(UITextAutocapitalizationType.none)
-
-                        if settings.deepl_api_key == "" {
-                            Link(NSLocalizedString("Get API Key", comment: "Button to navigate to DeepL website to get a translation API key."), destination: URL(string: "https://www.deepl.com/pro-api")!)
-                        }
-                    }
-                }
+       
 
                 Section(NSLocalizedString("Left Handed", comment: "Moves the post button to the left side of the screen")) {
                     Toggle(NSLocalizedString("Left Handed", comment: "Moves the post button to the left side of the screen"), isOn: $settings.left_handed)
@@ -203,7 +158,7 @@ struct ConfigView: View {
                     
                     TextField(NSLocalizedString("https://nostrnames.org/api/names/", comment: "The Bitcoin Name System node name endpoint used for looking up NIP-69 names."), text: $settings.bns_node)
                 }
-
+                
                 Section(NSLocalizedString("Images", comment: "Section title for images configuration.")) {
                     Toggle(NSLocalizedString("Disable animations", comment: "Button to disable image animation"), isOn: $settings.disable_animation)
                         .toggleStyle(.switch)

@@ -11,6 +11,8 @@ struct SideMenuView: View {
     let damus_state: DamusState
     @Binding var isSidebarVisible: Bool
     @State var confirm_logout: Bool = false
+    @State var nip69: NIP69?
+
     
     @State private var showQRCode = false
     
@@ -25,6 +27,10 @@ struct SideMenuView: View {
     
     func textColor() -> Color {
         colorScheme == .light ? Color("DamusBlack") : Color("DamusWhite")
+    }
+    
+    var current_nip69: NIP69? {
+        nip69 ?? damus_state.profiles.is_has_name(damus_state.pubkey)
     }
     
     var body: some View {
@@ -67,11 +73,21 @@ struct SideMenuView: View {
                                             .font(.title)
                                             .lineLimit(1)
                                     }
-                                    if let name = profile?.name {
-                                        Text("@" + name)
-                                            .foregroundColor(Color("DamusMediumGrey"))
-                                            .font(.body)
-                                            .lineLimit(1)
+                                    HStack(spacing: 2) {
+                                        if let name = profile?.name {
+                                            if let nip69 = current_nip69 {
+                                                Text("@" + String(nip69.name))
+                                                    .font(.body)
+                                                    .foregroundColor(.accentColor)
+                                                    .lineLimit(1)
+                                                NIP69Badge(nip69: nip69, pubkey: damus_state.pubkey, contacts: damus_state.contacts, clickable: true)
+                                            } else {
+                                                Text("@" + name)
+                                                    .foregroundColor(Color("DamusMediumGrey"))
+                                                    .font(.body)
+                                                    .lineLimit(1)
+                                            }
+                                        }
                                     }
                                 }
                             }

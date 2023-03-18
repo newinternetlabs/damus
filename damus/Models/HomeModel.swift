@@ -646,7 +646,7 @@ func process_metadata_event(our_pubkey: String, profiles: Profiles, ev: NostrEve
     var old_nip69: String? = nil
     if let mprof = profiles.lookup_with_timestamp(id: ev.pubkey) {
         old_nip05 = mprof.profile.nip05
-        old_nip69 = mprof.profile.nip69
+        old_nip69 = mprof.profile.name
         if mprof.timestamp > ev.created_at {
             // skip if we already have an newer profile
             return
@@ -670,7 +670,7 @@ func process_metadata_event(our_pubkey: String, profiles: Profiles, ev: NostrEve
         }
     }
     
-    if let nip69 = profile.nip69, old_nip69 != profile.nip69 {
+    if let nip69 = profile.name, old_nip69 != profile.name {
         Task.detached(priority: .background) {
             print("validating nip69 for '\(nip69)'")
             let validated = await validate_nip69(pubkey: ev.pubkey, nip69_str: nip69)
