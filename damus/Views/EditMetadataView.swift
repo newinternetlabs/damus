@@ -148,13 +148,17 @@ struct EditMetadataView: View {
                         .textInputAutocapitalization(.never)
                 }
                 
-                Section(NSLocalizedString("Username", comment: "Label for Username section of user profile form.")) {
-                    TextField("satoshi", text: $name)
+                Section(content: {
+                    TextField("satoshi.sats", text: $name)
                         .autocorrectionDisabled(true)
                         .textInputAutocapitalization(.never)
-
-                }
-                
+                }, header: {
+                    Text(NSLocalizedString("Username", comment: "Label for Username section of user profile form."))
+                    
+                }, footer: {
+                    Text("Enter your .sats or .btc Nostr Name in this field.")
+                })
+                 
                 Section (NSLocalizedString("Profile Picture", comment: "Label for Profile Picture section of user profile form.")) {
                     TextField(NSLocalizedString("https://example.com/pic.jpg", comment: "Placeholder example text for profile picture URL."), text: $picture)
                         .autocorrectionDisabled(true)
@@ -204,20 +208,6 @@ struct EditMetadataView: View {
                         Text("'\(parts.username)' at '\(parts.host)' will be used for verification", comment: "Description of how the nip05 identifier would be used for verification.")
                     } else {
                         Text("'\(nip05)' is an invalid NIP-05 identifier. It should look like an email.", comment: "Description of why the nip05 identifier is invalid.")
-                    }
-                })
-                
-                Section(content: {
-                    TextField(NSLocalizedString("larry.btc", comment: "Placeholder example text for identifier used for NIP-69 verification."), text: $nip69)
-                        .autocorrectionDisabled(true)
-                        .textInputAutocapitalization(.never)
-                }, header: {
-                    Text("NIP-69 Nostr Name", comment: "Label for NIP-69 Verification section of user profile form.")
-                }, footer: {
-                    if let parts = nip69_parts {
-                        Text("'\(parts.name)' will be used as your Nostr name.", comment: "Description of how the nip69 identifier will be used.")
-                    } else {
-                        Text("'\(nip05)' is an invalid nip69 name. It should look like a domain name.", comment: "Description of why the nip69 name is invalid.")
                     }
                 })
 
