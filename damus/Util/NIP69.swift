@@ -38,15 +38,11 @@ enum NIP69Validation {
     case valid
 }
 
-func validate_nip69(pubkey: String, nip69_str: String) async -> NIP69? {
-    
-    print("validate_nip69(pubkey: \"\(pubkey)\", nip69_str: \"\(nip69_str)\")")
-    guard let nip69 = NIP69.parse(nip69_str) else {
+func retrieve_pubkey_for_name(name: String) async -> NIP69Response? {
+    print("retrieve_pubkey_for_name(\(name)")
+    guard let nip69 = NIP69.parse(name) else {
         return nil
     }
-
-    print("using to validate \(nip69.name)")
-    print("\(nip69.name) is in expected nip69 format")
     
 //    guard let url = nip69.url else {
 //        print("invalid url for \(nip69.name)")
@@ -76,12 +72,27 @@ func validate_nip69(pubkey: String, nip69_str: String) async -> NIP69? {
     }
     print("nip69: decoded")
     print(decoded)
-    
+    return decoded
+}
+
+func validate_nip69(pubkey: String, name: String) async -> NIP69? {
+    print("validate_nip69(pubkey: \"\(pubkey)\", name: \"\(name)\")")
 
     
-    print("nip69: pubkey for \(nip69.name) is \(decoded.hex)")
-    if pubkey != decoded.hex {
-        print("nip69: \(nip69.name)'s pubkey \(decoded.hex) does not match profile's pubkey \(pubkey)")
+    let response: NIP69Response? = await retrieve_pubkey_for_name(name: name)
+    
+    guard let namePubkey = response else {
+        print("no nostr public key for \(name)")
+        return nil
+    }
+    
+    guard let nip69 = NIP69.parse(name) else {
+        return nil
+    }
+    
+    print("nip69: pubkey for \(nip69.name) is \(namePubkey.hex)")
+    if pubkey != namePubkey.hex {
+        print("nip69: \(nip69.name)'s pubkey \(namePubkey.hex) does not match profile's pubkey \(pubkey)")
         return nil
     }
     

@@ -673,7 +673,7 @@ func process_metadata_event(our_pubkey: String, profiles: Profiles, ev: NostrEve
     if let nip69 = profile.name, old_nip69 != profile.name {
         Task.detached(priority: .background) {
             print("validating nip69 for '\(nip69)'")
-            let validated = await validate_nip69(pubkey: ev.pubkey, nip69_str: nip69)
+            let validated = await validate_nip69(pubkey: ev.pubkey, name: nip69)
             if validated != nil {
                 print("validated nip69 for '\(nip69)'")
             }

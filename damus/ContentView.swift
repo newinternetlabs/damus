@@ -336,28 +336,30 @@ struct ContentView: View {
             }
         }
         .onOpenURL { url in
-            guard let link = decode_nostr_uri(url.absoluteString) else {
-                return
-            }
-            
-            switch link {
-            case .ref(let ref):
-                if ref.key == "p" {
-                    active_profile = ref.ref_id
-                    profile_open = true
-                } else if ref.key == "e" {
-                    find_event(state: damus_state!, evid: ref.ref_id, search_type: .event, find_from: nil) { ev in
-                        if let ev {
-                            active_event = ev
-                        }
-                    }
-                    thread_open = true
+            Task.init {
+                guard let link = await decode_nostr_uri(url.absoluteString) else {
+                    return
                 }
-            case .filter(let filt):
-                active_search = filt
-                search_open = true
-                break
-                // TODO: handle filter searches?
+                
+                switch link {
+                case .ref(let ref):
+                    if ref.key == "p" {
+                        active_profile = ref.ref_id
+                        profile_open = true
+                    } else if ref.key == "e" {
+                        find_event(state: damus_state!, evid: ref.ref_id, search_type: .event, find_from: nil) { ev in
+                            if let ev {
+                                active_event = ev
+                            }
+                        }
+                        thread_open = true
+                    }
+                case .filter(let filt):
+                    active_search = filt
+                    search_open = true
+                    break
+                    // TODO: handle filter searches?
+                }
             }
             
         }

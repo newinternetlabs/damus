@@ -119,7 +119,7 @@ func decode_nostr_bech32_uri(_ s: String) -> NostrLink? {
     }
 }
 
-func decode_nostr_uri(_ s: String) -> NostrLink? {
+func decode_nostr_uri(_ s: String) async -> NostrLink? {
     if s.starts(with: "https://damus.io/") {
         return decode_universal_link(s)
     }
@@ -149,6 +149,16 @@ func decode_nostr_uri(_ s: String) -> NostrLink? {
     }
     
     let part = parts[0]
+    
+    // decode possible nostr name
+    // nostr:satoshi.sats
+    let name_parts = part.split(separator: ".")
+    if name_parts.count == 2 {
+        if let pubkey = await retrieve_pubkey_for_name(name:part) {
+            return decode_nostr_bech32_uri(pubkey.npub)
+        }
+        
+    }
     
     return decode_nostr_bech32_uri(part)
 }

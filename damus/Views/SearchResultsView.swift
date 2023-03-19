@@ -73,10 +73,14 @@ struct SearchResultsView: View {
         MainContent
             .frame(maxHeight: .infinity)
             .onAppear {
-                self.result = search_changed(profiles: damus_state.profiles, search)
+                Task.init {
+                    self.result = await search_changed(profiles: damus_state.profiles, search)
+                }
             }
             .onChange(of: search) { new in
-                self.result = search_changed(profiles: damus_state.profiles, new)
+                Task.init {
+                    self.result = await search_changed(profiles: damus_state.profiles, new)
+                }
             }
     }
 }
@@ -90,7 +94,7 @@ struct SearchResultsView_Previews: PreviewProvider {
  */
 
 
-func search_changed(profiles: Profiles, _ new: String) -> Search? {
+func search_changed(profiles: Profiles, _ new: String) async -> Search? {
     guard new.count != 0 else {
         return nil
     }
@@ -102,6 +106,20 @@ func search_changed(profiles: Profiles, _ new: String) -> Search? {
     
     if hex_decode(new) != nil, new.count == 64 {
         return .hex(new)
+    }
+    
+    // look for nostr names
+    let parts = new.split(separator: ".")
+    
+    if parts.count == 2 {
+        // might be a nostr name
+        if let pubkey = await retrieve_pubkey_for_name(name: new) {
+            if (try? bech32_decode(pubkey.npub)) != nil {
+                return .profile(pubkey.npub)
+            }
+        } else {
+            // something wrong with the key
+        }
     }
     
     if new.starts(with: "npub") {
