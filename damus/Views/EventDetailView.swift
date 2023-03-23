@@ -10,20 +10,20 @@ import SwiftUI
 
 struct EventDetailView: View {
     var body: some View {
-        Text("EventDetailView")
+        Text(verbatim: "EventDetailView")
     }
 }
 
 func scroll_after_load(thread: ThreadModel, proxy: ScrollViewProxy) {
     if !thread.loading {
-        let id = thread.initial_event.id
+        let id = thread.event.id
         scroll_to_event(scroller: proxy, id: id, delay: 0.1, animate: false)
     }
 }
 
 struct EventDetailView_Previews: PreviewProvider {
     static var previews: some View {
-        let state = test_damus_state()
+        let _ = test_damus_state()
         EventDetailView()
     }
 }
@@ -33,14 +33,14 @@ func print_event(_ ev: NostrEvent) {
     print(ev.description)
 }
 
-func scroll_to_event(scroller: ScrollViewProxy, id: String, delay: Double, animate: Bool) {
+func scroll_to_event(scroller: ScrollViewProxy, id: String, delay: Double, animate: Bool, anchor: UnitPoint = .bottom) {
     DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
         if animate {
             withAnimation {
-                scroller.scrollTo(id, anchor: .bottom)
+                scroller.scrollTo(id, anchor: anchor)
             }
         } else {
-            scroller.scrollTo(id, anchor: .bottom)
+            scroller.scrollTo(id, anchor: anchor)
         }
     }
 }

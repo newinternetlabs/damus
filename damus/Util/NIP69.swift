@@ -29,7 +29,8 @@ struct NIP69 {
 
 
 struct NIP69Response: Decodable {
-    let zonefile: String
+    let hex: String
+    let npub: String
 }
 
 enum NIP69Validation {
@@ -37,18 +38,11 @@ enum NIP69Validation {
     case valid
 }
 
-func validate_nip69(pubkey: String, nip69_str: String) async -> NIP69? {
-    
-    print("validate_nip69(pubkey: \"\(pubkey)\", nip69_str: \"\(nip69_str)\")")
-    guard let nip69 = NIP69.parse(nip69_str) else {
+func retrieve_pubkey_for_name(name: String) async -> NIP69Response? {
+    print("retrieve_pubkey_for_name(\(name)")
+    guard let nip69 = NIP69.parse(name) else {
         return nil
     }
-    
-    let zonefileParser = ZonefileParser()
-    print(zonefileParser)
-    
-    print("using to validate \(nip69.name)")
-    print("\(nip69.name) is in expected nip69 format")
     
 //    guard let url = nip69.url else {
 //        print("invalid url for \(nip69.name)")
@@ -62,15 +56,15 @@ func validate_nip69(pubkey: String, nip69_str: String) async -> NIP69? {
     let nodeURL: URL = userNodeURL == nil ? NIP69.DEFAULT_NODE_URL : userNodeURL!
  
     let url = URL(string: "\(nodeURL.absoluteString)\(nip69.name)")!
-    print("nip69: fetching zonefile using \(url)")
+    print("nip69: fetching public key using node: \(url)")
     guard let ret = try? await URLSession.shared.data(from: url) else {
-        print("fetching zonefile for \(nip69.name) failed")
+        print("fetching public key for \(nip69.name) failed")
         return nil
     }
 
     let dat = ret.0
-    //print("printing data from nip69 validation endpoint query \(nip69.name) - \(ret)")
-    //print(dat)
+    print("printing data from nip69 validation endpoint query \(nip69.name) - \(ret)")
+    print(dat)
     
     guard let decoded = try? JSONDecoder().decode(NIP69Response.self, from: dat) else {
         print("nip69: decoding failed")
@@ -78,15 +72,27 @@ func validate_nip69(pubkey: String, nip69_str: String) async -> NIP69? {
     }
     print("nip69: decoded")
     print(decoded)
+    return decoded
+}
+
+func validate_nip69(pubkey: String, name: String) async -> NIP69? {
+    print("validate_nip69(pubkey: \"\(pubkey)\", name: \"\(name)\")")
+
     
-    guard let namePubKey = zonefileParser.parseZonefileForNostrPubKey(zonefileString: decoded.zonefile) else {
-        print("nip69: no nostr pub key found in \(nip69.name) zonefile")
+    let response: NIP69Response? = await retrieve_pubkey_for_name(name: name)
+    
+    guard let namePubkey = response else {
+        print("no nostr public key for \(name)")
         return nil
     }
     
-    print("nip69: pubkey for \(nip69.name) is \(namePubKey)")
-    guard namePubKey == pubkey else {
-        print("nip69: \(nip69.name)'s pubkey \(namePubKey) does not match profile's pubkey \(pubkey)")
+    guard let nip69 = NIP69.parse(name) else {
+        return nil
+    }
+    
+    print("nip69: pubkey for \(nip69.name) is \(namePubkey.hex)")
+    if pubkey != namePubkey.hex {
+        print("nip69: \(nip69.name)'s pubkey \(namePubkey.hex) does not match profile's pubkey \(pubkey)")
         return nil
     }
     

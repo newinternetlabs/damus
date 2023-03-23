@@ -35,14 +35,14 @@ struct ChatView: View {
         }
         
         if let rep = thread.replies.lookup(event.id) {
-            return rep == prev.id
+            return rep.contains(prev.id)
         }
         
         return false
     }
     
     var is_active: Bool {
-        return thread.initial_event.id == event.id
+        return thread.event.id == event.id
     }
     
     func prev_reply_is_same() -> String? {
@@ -63,7 +63,7 @@ struct ChatView: View {
     }
     
     var ReplyDescription: some View {
-        Text("\(reply_desc(profiles: damus_state.profiles, event: event))")
+        Text(verbatim: "\(reply_desc(profiles: damus_state.profiles, event: event))")
             .font(.footnote)
             .foregroundColor(.gray)
             .frame(alignment: .leading)
@@ -89,12 +89,12 @@ struct ChatView: View {
                             ProfileName(pubkey: event.pubkey, profile: damus_state.profiles.lookup(id: event.pubkey), damus: damus_state, show_friend_confirmed: true)
                                 .foregroundColor(colorScheme == .dark ?  id_to_color(event.pubkey) : Color.black)
                                 //.shadow(color: Color.black, radius: 2)
-                            Text("\(format_relative_time(event.created_at))")
+                            Text(verbatim: "\(format_relative_time(event.created_at))")
                                     .foregroundColor(.gray)
                         }
                     }
                 
-                    if let ref_id = thread.replies.lookup(event.id) {
+                    if let _ = thread.replies.lookup(event.id) {
                         if !is_reply_to_prev() {
                             /*
                             ReplyQuoteView(keypair: damus_state.keypair, quoter: event, event_id: ref_id, profiles: damus_state.profiles, previews: damus_state.previews)
@@ -112,8 +112,9 @@ struct ChatView: View {
                     NoteContentView(damus_state: damus_state,
                                     event: event,
                                     show_images: show_images,
+                                    size: .normal,
                                     artifacts: .just_content(event.content),
-                                    size: .normal)
+                                    truncate: false)
 
                     if is_active || next_ev == nil || next_ev!.pubkey != event.pubkey {
                         let bar = make_actionbar_model(ev: event.id, damus: damus_state)
@@ -160,7 +161,7 @@ func prev_reply_is_same(event: NostrEvent, prev_ev: NostrEvent?, replies: ReplyM
         if let prev_reply_id = replies.lookup(prev.id) {
             if let cur_reply_id = replies.lookup(event.id) {
                 if prev_reply_id != cur_reply_id {
-                    return cur_reply_id
+                    return cur_reply_id.first
                 }
             }
         }

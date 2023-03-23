@@ -82,9 +82,9 @@ struct ProfileName: View {
                         .fontWeight(prefix == "@" ? .none : .bold).foregroundColor(.accentColor)
                     NIP69Badge(nip69: nip69, pubkey: pubkey, contacts: damus_state.contacts, clickable: true)
                 } else {
-                    Text(prefix + String(display_name ?? Profile.displayName(profile: profile, pubkey: pubkey)))
-                        .font(.body)
-                        .fontWeight(prefix == "@" ? .none : .bold)
+ Text(verbatim: "\(prefix)\(String(display_name ?? Profile.displayName(profile: profile, pubkey: pubkey)))")
+                .font(.body)
+                .fontWeight(prefix == "@" ? .none : .bold)
                 }
                 if let friend = friend_icon, current_nip05 == nil {
                     Image(systemName: friend)
@@ -172,12 +172,13 @@ struct EventProfileName: View {
                         .foregroundColor(.accentColor)
                         .font(eventviewsize_to_font(size))
                 } else {
-                    Text("@" + String(display_name ?? Profile.displayName(profile: profile, pubkey: pubkey)))
+              Text(verbatim: "@\(display_name ?? Profile.displayName(profile: profile, pubkey: pubkey))")
                         .foregroundColor(Color("DamusMediumGrey"))
                         .font(eventviewsize_to_font(size))
                 }
+
             } else {
-                Text(String(display_name ?? Profile.displayName(profile: profile, pubkey: pubkey)))
+                Text(verbatim: "\(display_name ?? Profile.displayName(profile: profile, pubkey: pubkey))")
                     .font(eventviewsize_to_font(size))
                     .fontWeight(.bold)
             }
@@ -203,3 +204,9 @@ struct EventProfileName: View {
     }
 }
 
+struct ProfileName_Previews: PreviewProvider {
+    static var previews: some View {
+        ProfileName(pubkey:
+                        test_damus_state().pubkey, profile: make_test_profile(), damus: test_damus_state(), show_friend_confirmed: true)
+    }
+}

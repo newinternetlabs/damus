@@ -81,7 +81,7 @@ struct ContentView: View {
     @State var event: NostrEvent? = nil
     @State var active_profile: String? = nil
     @State var active_search: NostrFilter? = nil
-    @State var active_event_id: String? = nil
+    @State var active_event: NostrEvent = test_event
     @State var profile_open: Bool = false
     @State var thread_open: Bool = false
     @State var search_open: Bool = false
@@ -92,7 +92,7 @@ struct ContentView: View {
     @State var filter_state : FilterState = .posts_and_replies
     @State private var isSideBarOpened = false
     @StateObject var home: HomeModel = HomeModel()
-
+    
     // connect retry timer
     let timer = Timer.publish(every: 4, on: .main, in: .common).autoconnect()
 
@@ -136,7 +136,7 @@ struct ContentView: View {
     func contentTimelineView(filter: (@escaping (NostrEvent) -> Bool)) -> some View {
         ZStack {
             if let damus = self.damus_state {
-                TimelineView(events: $home.events, loading: $home.loading, damus: damus, show_friend_icon: false, filter: filter)
+                TimelineView(events: home.events, loading: $home.loading, damus: damus, show_friend_icon: false, filter: filter)
             }
         }
     }
@@ -147,27 +147,23 @@ struct ContentView: View {
         search_open = false
         isSideBarOpened = false
     }
-
-    var timelineNavItem: some View {
-        VStack {
-            switch selected_timeline {
-            case .home:
-                Image("damus-home")
-                .resizable()
-                .frame(width:30,height:30)
-                .shadow(color: Color("DamusPurple"), radius: 2)
-            case .dms:
-                Text("DMs", comment: "Toolbar label for DMs view, where DM is the English abbreviation for Direct Message.")
-                    .bold()
-            case .notifications:
-                Text("Notifications", comment: "Toolbar label for Notifications view.")
-                    .bold()
-            case .search:
-                Text("Global", comment: "Toolbar label for Global view where posts from all connected relay servers appear.")
-                    .bold()
-            case .none:
-                Text("", comment: "Toolbar label for unknown views. This label would be displayed only if a new timeline view is added but a toolbar label was not explicitly assigned to it yet.")
-            }
+    
+    var timelineNavItem: Text {
+        switch selected_timeline {
+        case .home:
+            return Text("Home", comment: "Navigation bar title for Home view where posts and replies appear from those who the user is following.")
+                .bold()
+        case .dms:
+            return Text("DMs", comment: "Toolbar label for DMs view, where DM is the English abbreviation for Direct Message.")
+                .bold()
+        case .notifications:
+            return Text("Notifications", comment: "Toolbar label for Notifications view.")
+                .bold()
+        case .search:
+            return Text("Universe 🛸", comment: "Toolbar label for the universal view where posts from all connected relay servers appear.")
+                .bold()
+        case .none:
+            return Text(verbatim: "")
         }
     }
     
@@ -176,7 +172,8 @@ struct ContentView: View {
             NavigationLink(destination: MaybeProfileView, isActive: $profile_open) {
                 EmptyView()
             }
-            NavigationLink(destination: MaybeThreadView, isActive: $thread_open) {
+            let thread = ThreadModel(event: active_event, damus_state: damus_state!)
+            NavigationLink(destination: ThreadView(state: damus_state!, thread: thread), isActive: $thread_open) {
                 EmptyView()
             }
             NavigationLink(destination: MaybeSearchView, isActive: $search_open) {
@@ -190,10 +187,8 @@ struct ContentView: View {
                 PostingTimelineView
                 
             case .notifications:
-                VStack(spacing: 0) {
-                    Divider()
-                    TimelineView(events: $home.notifications, loading: $home.loading, damus: damus, show_friend_icon: true, filter: { _ in true })
-                }
+                NotificationsView(state: damus, notifications: home.notifications)
+                
             case .dms:
                 DirectMessagesView(damus_state: damus_state!)
                     .environmentObject(home.dms)
@@ -202,12 +197,21 @@ struct ContentView: View {
                 EmptyView()
             }
         }
-        .navigationBarTitle(selected_timeline == .home ?  NSLocalizedString("Home", comment: "Navigation bar title for Home view where posts and replies appear from those who the user is following.") : NSLocalizedString("Global", comment: "Navigation bar title for Global view where posts from all connected relay servers appear."), displayMode: .inline)
+        .navigationBarTitle(timeline_name(selected_timeline), displayMode: .inline)
         .toolbar {
             ToolbarItem(placement: .principal) {
-                timelineNavItem
-                    .opacity(isSideBarOpened ? 0 : 1)
-                    .animation(isSideBarOpened ? .none : .default, value: isSideBarOpened)
+                VStack {
+                    if selected_timeline == .home {
+                        Image("damus-home")
+                            .resizable()
+                            .frame(width:30,height:30)
+                            .shadow(color: Color("DamusPurple"), radius: 2)
+                    } else {
+                        timelineNavItem
+                            .opacity(isSideBarOpened ? 0 : 1)
+                            .animation(isSideBarOpened ? .none : .default, value: isSideBarOpened)
+                    }
+                }
             }
         }
         .ignoresSafeArea(.keyboard)
@@ -217,16 +221,6 @@ struct ContentView: View {
         Group {
             if let search = self.active_search {
                 SearchView(appstate: damus_state!, search: SearchModel(contacts: damus_state!.contacts, pool: damus_state!.pool, search: search))
-            } else {
-                EmptyView()
-            }
-        }
-    }
-    
-    var MaybeThreadView: some View {
-        Group {
-            if let evid = self.active_event_id {
-                BuildThreadV2View(damus: damus_state!, event_id: evid)
             } else {
                 EmptyView()
             }
@@ -295,7 +289,7 @@ struct ContentView: View {
                                                     self.active_sheet = .filter
                                                 }) {
                                                     // checklist, checklist.checked, lisdt.bullet, list.bullet.circle, line.3.horizontal.decrease...,  line.3.horizontail.decrease
-                                                    Label("Filter", systemImage: "line.3.horizontal.decrease")
+                                                    Label(NSLocalizedString("Filter", comment: "Button label text for filtering relay servers."), systemImage: "line.3.horizontal.decrease")
                                                         .foregroundColor(.gray)
                                                         //.contentShape(Rectangle())
                                                 }
@@ -328,7 +322,7 @@ struct ContentView: View {
                 PostView(replying_to: nil, references: [], damus_state: damus_state!)
             case .reply(let event):
                 ReplyView(replying_to: event, damus: damus_state!)
-            case .event(let event):
+            case .event:
                 EventDetailView()
             case .filter:
                 let timeline = selected_timeline ?? .home
@@ -342,24 +336,30 @@ struct ContentView: View {
             }
         }
         .onOpenURL { url in
-            guard let link = decode_nostr_uri(url.absoluteString) else {
-                return
-            }
-            
-            switch link {
-            case .ref(let ref):
-                if ref.key == "p" {
-                    active_profile = ref.ref_id
-                    profile_open = true
-                } else if ref.key == "e" {
-                    active_event_id = ref.ref_id
-                    thread_open = true
+            Task.init {
+                guard let link = await decode_nostr_uri(url.absoluteString) else {
+                    return
                 }
-            case .filter(let filt):
-                active_search = filt
-                search_open = true
-                break
-                // TODO: handle filter searches?
+                
+                switch link {
+                case .ref(let ref):
+                    if ref.key == "p" {
+                        active_profile = ref.ref_id
+                        profile_open = true
+                    } else if ref.key == "e" {
+                        find_event(state: damus_state!, evid: ref.ref_id, search_type: .event, find_from: nil) { ev in
+                            if let ev {
+                                active_event = ev
+                            }
+                        }
+                        thread_open = true
+                    }
+                case .filter(let filt):
+                    active_search = filt
+                    search_open = true
+                    break
+                    // TODO: handle filter searches?
+                }
             }
             
         }
@@ -615,7 +615,9 @@ struct ContentView: View {
                                       settings: UserSettingsStore(),
                                       relay_filters: relay_filters,
                                       relay_metadata: metadatas,
-                                      drafts: Drafts()
+                                      drafts: Drafts(),
+                                      events: EventCache(),
+                                      bookmarks: BookmarksManager(pubkey: pubkey)
         )
         home.damus_state = self.damus_state!
         
@@ -764,3 +766,68 @@ func setup_notifications() {
     }
 }
 
+
+func find_event(state: DamusState, evid: String, search_type: SearchType, find_from: [String]?, callback: @escaping (NostrEvent?) -> ()) {
+    if let ev = state.events.lookup(evid) {
+        callback(ev)
+        return
+    }
+    
+    let subid = UUID().description
+    
+    var has_event = false
+    
+    var filter = search_type == .event ? NostrFilter.filter_ids([ evid ]) : NostrFilter.filter_authors([ evid ])
+    
+    if search_type == .profile {
+        filter.kinds = [0]
+    }
+    
+    filter.limit = 1
+    var attempts = 0
+    
+    state.pool.subscribe_to(sub_id: subid, filters: [filter], to: find_from) { relay_id, res  in
+        guard case .nostr_event(let ev) = res else {
+            return
+        }
+        
+        guard ev.subid == subid else {
+            return
+        }
+        
+        switch ev {
+        case .event(_, let ev):
+            has_event = true
+            callback(ev)
+            state.pool.unsubscribe(sub_id: subid)
+        case .eose:
+            if !has_event {
+                attempts += 1
+                if attempts == state.pool.descriptors.count / 2 {
+                    callback(nil)
+                }
+                state.pool.unsubscribe(sub_id: subid, to: [relay_id])
+            }
+        case .notice(_):
+            break
+        }
+
+    }
+}
+
+
+func timeline_name(_ timeline: Timeline?) -> String {
+    guard let timeline else {
+        return ""
+    }
+    switch timeline {
+    case .home:
+        return "Home"
+    case .notifications:
+        return "Notifications"
+    case .search:
+        return "Universe 🛸"
+    case .dms:
+        return "DMs"
+    }
+}
