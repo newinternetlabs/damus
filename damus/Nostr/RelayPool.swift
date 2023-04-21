@@ -52,6 +52,10 @@ class RelayPool {
     var num_connecting: Int {
         return relays.reduce(0) { n, r in n + (r.connection.isConnecting ? 1 : 0) }
     }
+    
+    var num_connected: Int {
+        return relays.reduce(0) { n, r in n + (r.connection.isConnected ? 1 : 0) }
+    }
 
     func remove_handler(sub_id: String) {
         self.handlers = handlers.filter { $0.sub_id != sub_id }
@@ -256,7 +260,6 @@ class RelayPool {
             }
         }
         
-        // handle reconnect logic, etc?
         for handler in handlers {
             handler.callback(relay_id, event)
         }

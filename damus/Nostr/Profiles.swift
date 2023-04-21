@@ -13,6 +13,7 @@ class Profiles {
     var profiles: [String: TimestampedProfile] = [:]
     var validated: [String: NIP05] = [:]
     var has_name: [String: NIP69] = [:]
+    var nip05_pubkey: [String: String] = [:]
     var zappers: [String: String] = [:]
     
     func is_validated(_ pk: String) -> NIP05? {

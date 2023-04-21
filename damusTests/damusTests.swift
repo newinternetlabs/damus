@@ -40,6 +40,13 @@ class damusTests: XCTestCase {
         XCTAssertEqual(bytes.count, 32)
     }
     
+    func testTrimmingFunctions() {
+        let txt = "   bobs   "
+        
+        XCTAssertEqual(trim_prefix(txt), "bobs   ")
+        XCTAssertEqual(trim_suffix(txt), "   bobs")
+    }
+    
     func testParseMentionWithMarkdown() {
         let md = """
         Testing markdown in damus
@@ -90,9 +97,9 @@ class damusTests: XCTestCase {
     
     func testSaveDefaultZapAmount() {
         let pubkey = "test_pubkey"
-        let amt = 1000
+        let amt = 1234
         set_default_zap_amount(pubkey: pubkey, amount: amt)
-        let loaded = get_default_zap_amount(pubkey: pubkey)!
+        let loaded = get_default_zap_amount(pubkey: pubkey)
         XCTAssertEqual(loaded, amt)
     }
     

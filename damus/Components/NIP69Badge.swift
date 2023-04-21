@@ -22,15 +22,13 @@ struct NIP69Badge: View {
         self.clickable = clickable
     }
     
-    var nip05_color: Color {
-       return get_nip05_color(pubkey: pubkey, contacts: contacts)
-    }
     
     var body: some View {
         HStack(spacing: 2) {
-            Image(systemName: "pill.fill")
+            LINEAR_GRADIENT
+                .mask(Image(systemName: "pill.fill").resizable()
+                ).frame(width: 14, height: 14)
                 .font(.footnote)
-                .foregroundColor(nip05_color)
 
         }
 

@@ -26,11 +26,13 @@ func set_default_zap_amount(pubkey: String, amount: Int) {
     UserDefaults.standard.setValue(amount, forKey: key)
 }
 
-func get_default_zap_amount(pubkey: String) -> Int? {
+let fallback_zap_amount = 1000
+
+func get_default_zap_amount(pubkey: String) -> Int {
     let key = default_zap_setting_key(pubkey: pubkey)
     let amt = UserDefaults.standard.integer(forKey: key)
     if amt == 0 {
-        return nil
+        return fallback_zap_amount
     }
     return amt
 }
@@ -47,6 +49,15 @@ func get_default_wallet(_ pubkey: String) -> Wallet {
         return default_wallet
     } else {
         return .system_default_wallet
+    }
+}
+
+func get_media_uploader(_ pubkey: String) -> MediaUploader {
+    if let defaultMediaUploader = UserDefaults.standard.string(forKey: "default_media_uploader"),
+       let defaultMediaUploader = MediaUploader(rawValue: defaultMediaUploader) {
+        return defaultMediaUploader
+    } else {
+        return .nostrBuild
     }
 }
 
@@ -88,6 +99,12 @@ class UserSettingsStore: ObservableObject {
             UserDefaults.standard.set(default_wallet.rawValue, forKey: "default_wallet")
         }
     }
+
+    @Published var default_media_uploader: MediaUploader {
+        didSet {
+            UserDefaults.standard.set(default_media_uploader.rawValue, forKey: "default_media_uploader")
+        }
+    }
     
     @Published var show_wallet_selector: Bool {
         didSet {
@@ -104,6 +121,90 @@ class UserSettingsStore: ObservableObject {
     @Published var bns_node: String {
         didSet {
             UserDefaults.standard.set(bns_node, forKey: "bns_node")
+        }
+    }
+    
+    @Published var always_show_images: Bool {
+        didSet {
+            UserDefaults.standard.set(always_show_images, forKey: "always_show_images")
+        }
+    }
+
+    @Published var zap_vibration: Bool {
+        didSet {
+            UserDefaults.standard.set(zap_vibration, forKey: "zap_vibration")
+        }
+    }
+
+    @Published var zap_notification: Bool {
+        didSet {
+            UserDefaults.standard.set(zap_notification, forKey: "zap_notification")
+        }
+    }
+
+    @Published var mention_notification: Bool {
+        didSet {
+            UserDefaults.standard.set(mention_notification, forKey: "mention_notification")
+        }
+    }
+
+    @Published var repost_notification: Bool {
+        didSet {
+            UserDefaults.standard.set(repost_notification, forKey: "repost_notification")
+        }
+    }
+
+    @Published var dm_notification: Bool {
+        didSet {
+            UserDefaults.standard.set(dm_notification, forKey: "dm_notification")
+        }
+    }
+
+    @Published var like_notification: Bool {
+        didSet {
+            UserDefaults.standard.set(like_notification, forKey: "like_notification")
+        }
+    }
+
+    @Published var notification_only_from_following: Bool {
+        didSet {
+            UserDefaults.standard.set(notification_only_from_following, forKey: "notification_only_from_following")
+        }
+    }
+    
+    @Published var translate_dms: Bool {
+        didSet {
+            UserDefaults.standard.set(translate_dms, forKey: "translate_dms")
+        }
+    }
+
+    @Published var truncate_timeline_text: Bool {
+        didSet {
+            UserDefaults.standard.set(truncate_timeline_text, forKey: "truncate_timeline_text")
+        }
+    }
+    
+    @Published var notification_indicators: Int {
+        didSet {
+            UserDefaults.standard.set(notification_indicators, forKey: "notification_indicators")
+        }
+    }
+    
+    @Published var truncate_mention_text: Bool {
+        didSet {
+            UserDefaults.standard.set(truncate_mention_text, forKey: "truncate_mention_text")
+        }
+    }
+
+    @Published var auto_translate: Bool {
+        didSet {
+            UserDefaults.standard.set(auto_translate, forKey: "auto_translate")
+        }
+    }
+
+    @Published var show_only_preferred_languages: Bool {
+        didSet {
+            UserDefaults.standard.set(show_only_preferred_languages, forKey: "show_only_preferred_languages")
         }
     }
 
@@ -182,11 +283,26 @@ class UserSettingsStore: ObservableObject {
         let pubkey = ""
         self.default_wallet = get_default_wallet(pubkey)
         show_wallet_selector = should_show_wallet_selector(pubkey)
+        always_show_images = UserDefaults.standard.object(forKey: "always_show_images") as? Bool ?? false
+
+        default_media_uploader = get_media_uploader(pubkey)
 
         left_handed = UserDefaults.standard.object(forKey: "left_handed") as? Bool ?? false
-        
         bns_node = UserDefaults.standard.object(forKey: "bns_node") as? String ?? "https://nostrnames.org/api/names/"
+        zap_vibration = UserDefaults.standard.object(forKey: "zap_vibration") as? Bool ?? false
+        zap_notification = UserDefaults.standard.object(forKey: "zap_notification") as? Bool ?? true
+        mention_notification = UserDefaults.standard.object(forKey: "mention_notification") as? Bool ?? true
+        repost_notification = UserDefaults.standard.object(forKey: "repost_notification") as? Bool ?? true
+        like_notification = UserDefaults.standard.object(forKey: "like_notification") as? Bool ?? true
+        dm_notification = UserDefaults.standard.object(forKey: "dm_notification") as? Bool ?? true
+        notification_indicators = UserDefaults.standard.object(forKey: "notification_indicators") as? Int ?? NewEventsBits.all.rawValue
+        notification_only_from_following = UserDefaults.standard.object(forKey: "notification_only_from_following") as? Bool ?? false
+        translate_dms = UserDefaults.standard.object(forKey: "translate_dms") as? Bool ?? false
+        truncate_timeline_text = UserDefaults.standard.object(forKey: "truncate_timeline_text") as? Bool ?? false
+        truncate_mention_text = UserDefaults.standard.object(forKey: "truncate_mention_text") as? Bool ?? false
         disable_animation = should_disable_image_animation()
+        auto_translate = UserDefaults.standard.object(forKey: "auto_translate") as? Bool ?? true
+        show_only_preferred_languages = UserDefaults.standard.object(forKey: "show_only_preferred_languages") as? Bool ?? false
 
         // Note from @tyiu:
         // Default translation service is disabled by default for now until we gain some confidence that it is working well in production.

@@ -10,13 +10,18 @@ import CommonCrypto
 import secp256k1
 import secp256k1_implementation
 import CryptoKit
-
+import NaturalLanguage
 
 
 enum ValidationResult: Decodable {
+    case unknown
     case ok
     case bad_id
     case bad_sig
+    
+    var is_bad: Bool {
+        return self == .bad_id || self == .bad_sig
+    }
 }
 
 struct OtherEvent {
@@ -81,7 +86,7 @@ class NostrEvent: Codable, Identifiable, CustomStringConvertible, Equatable, Has
     }
     
     var too_big: Bool {
-        return self.content.count > 16000
+        return self.content.utf8.count > 16000
     }
     
     var should_show_event: Bool {
@@ -91,14 +96,6 @@ class NostrEvent: Codable, Identifiable, CustomStringConvertible, Equatable, Has
     var is_valid_id: Bool {
         return calculate_event_id(ev: self) == self.id
     }
-    
-    var is_valid: Bool {
-        return validity == .ok
-    }
-    
-    lazy var validity: ValidationResult = {
-        return .ok //validate_event(ev: self)
-    }()
     
     private var _blocks: [Block]? = nil
     func blocks(_ privkey: String?) -> [Block] {
@@ -257,6 +254,25 @@ class NostrEvent: Codable, Identifiable, CustomStringConvertible, Equatable, Has
 
     func is_reply(_ privkey: String?) -> Bool {
         return event_is_reply(self, privkey: privkey)
+    }
+
+    func note_language(_ privkey: String?) -> String? {
+        // Rely on Apple's NLLanguageRecognizer to tell us which language it thinks the note is in
+        // and filter on only the text portions of the content as URLs and hashtags confuse the language recognizer.
+        let originalBlocks = blocks(privkey)
+        let originalOnlyText = originalBlocks.compactMap { $0.is_text }.joined(separator: " ")
+
+        // Only accept language recognition hypothesis if there's at least a 50% probability that it's accurate.
+        let languageRecognizer = NLLanguageRecognizer()
+        languageRecognizer.processString(originalOnlyText)
+
+        guard let locale = languageRecognizer.languageHypotheses(withMaximum: 1).first(where: { $0.value >= 0.5 })?.key.rawValue else {
+            return nil
+        }
+
+        // Remove the variant component and just take the language part as translation services typically only supports the variant-less language.
+        // Moreover, speakers of one variant can generally understand other variants.
+        return localeToLanguage(locale)
     }
 
     public var referenced_ids: [ReferencedId] {
@@ -518,16 +534,21 @@ func make_first_contact_event(keypair: Keypair) -> NostrEvent? {
     guard let privkey = keypair.privkey else {
         return nil
     }
-
+    
+    let bootstrap_relays = load_bootstrap_relays(pubkey: keypair.pubkey)
     let rw_relay_info = RelayInfo(read: true, write: true)
     var relays: [String: RelayInfo] = [:]
-    for relay in BOOTSTRAP_RELAYS {
+    
+    for relay in bootstrap_relays {
         relays[relay] = rw_relay_info
     }
+    
     let relay_json = encode_json(relays)!
     let damus_pubkey = "3efdaebb1d8923ebd99c9e7ace3b4194ab45512e2be79c1b7d68d9243e0d2681"
+    let jb55_pubkey = "32e1827635450ebb3c5a7d12c1f8e7b2b514439ac10a67eef3d9fd9c5c68e245" // lol
     let tags = [
         ["p", damus_pubkey],
+        ["p", jb55_pubkey],
         ["p", keypair.pubkey] // you're a friend of yourself!
     ]
     let ev = NostrEvent(content: relay_json,
@@ -699,11 +720,34 @@ func make_zap_request_event(keypair: FullKeypair, content: String, relays: [Rela
     return ev
 }
 
+func uniq<T: Hashable>(_ xs: [T]) -> [T] {
+    var s = Set<T>()
+    var ys: [T] = []
+    
+    for x in xs {
+        if s.contains(x) {
+            continue
+        }
+        s.insert(x)
+        ys.append(x)
+    }
+    
+    return ys
+}
+
 func gather_reply_ids(our_pubkey: String, from: NostrEvent) -> [ReferencedId] {
     var ids = get_referenced_ids(tags: from.tags, key: "e").first.map { [$0] } ?? []
 
     ids.append(ReferencedId(ref_id: from.id, relay_id: nil, key: "e"))
-    ids.append(contentsOf: from.referenced_pubkeys.filter { $0.ref_id != our_pubkey })
+    ids.append(contentsOf: uniq(from.referenced_pubkeys.filter { $0.ref_id != our_pubkey }))
+    if from.pubkey != our_pubkey {
+        ids.append(ReferencedId(ref_id: from.pubkey, relay_id: nil, key: "p"))
+    }
+    return ids
+}
+
+func gather_quote_ids(our_pubkey: String, from: NostrEvent) -> [ReferencedId] {
+    var ids: [ReferencedId] = []
     if from.pubkey != our_pubkey {
         ids.append(ReferencedId(ref_id: from.pubkey, relay_id: nil, key: "p"))
     }

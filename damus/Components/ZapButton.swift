@@ -81,7 +81,7 @@ struct ZapButton: View {
                 
                 self.showing_zap_customizer = true
             })
-            .simultaneousGesture(TapGesture().onEnded {_  in
+            .highPriorityGesture(TapGesture().onEnded {_  in
                 guard !zapping else {
                     return
                 }
@@ -134,7 +134,7 @@ struct ZapButton: View {
 
 struct ZapButton_Previews: PreviewProvider {
     static var previews: some View {
-        let bar = ActionBarModel(likes: 0, boosts: 0, zaps: 10, zap_total: 15623414, our_like: nil, our_boost: nil, our_zap: nil)
+        let bar = ActionBarModel(likes: 0, boosts: 0, zaps: 10, zap_total: 15623414, replies: 2, our_like: nil, our_boost: nil, our_zap: nil, our_reply: nil)
         ZapButton(damus_state: test_damus_state(), event: test_event, lnurl: "lnurl", bar: bar)
     }
 }
@@ -173,7 +173,7 @@ func send_zap(damus_state: DamusState, event: NostrEvent, lnurl: String, is_cust
             damus_state.lnurls.endpoints[target.pubkey] = payreq
         }
         
-        let zap_amount = amount_sats ?? get_default_zap_amount(pubkey: damus_state.pubkey) ?? 1000
+        let zap_amount = amount_sats ?? get_default_zap_amount(pubkey: damus_state.pubkey)
         
         guard let inv = await fetch_zap_invoice(payreq, zapreq: zapreq, sats: zap_amount, zap_type: zap_type, comment: comment) else {
             DispatchQueue.main.async {

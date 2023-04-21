@@ -22,5 +22,5 @@ struct NostrMetadata: Codable {
 }
 
 func create_account_to_metadata(_ model: CreateAccountModel) -> NostrMetadata {
-    return NostrMetadata(display_name: model.real_name, name: model.nick_name, about: model.about, website: nil, nip05: nil, picture: nil, banner: nil, lud06: nil, lud16: nil, nip69: nil)
+    return NostrMetadata(display_name: model.real_name, name: model.nick_name, about: model.about, website: nil, nip05: nil, picture: model.profile_image, banner: nil, lud06: nil, lud16: nil, nip69: nil)
 }
