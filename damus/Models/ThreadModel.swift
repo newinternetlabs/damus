@@ -114,6 +114,7 @@ class ThreadModel: ObservableObject {
         }
         
         let the_ev = damus_state.events.upsert(ev)
+        damus_state.replies.count_replies(the_ev)
         damus_state.events.add_replies(ev: the_ev)
         
         event_map.insert(ev)
@@ -128,7 +129,7 @@ class ThreadModel: ObservableObject {
             }
             
             if ev.known_kind == .metadata {
-                process_metadata_event(our_pubkey: damus_state.pubkey, profiles: damus_state.profiles, ev: ev)
+                process_metadata_event(events: damus_state.events, our_pubkey: damus_state.pubkey, profiles: damus_state.profiles, ev: ev)
             } else if ev.is_textlike {
                 self.add_event(ev, privkey: self.damus_state.keypair.privkey)
             }

@@ -9,17 +9,20 @@ import SwiftUI
 
 struct DMChatView: View {
     let damus_state: DamusState
-    let pubkey: String
-    @EnvironmentObject var dms: DirectMessageModel
+    @ObservedObject var dms: DirectMessageModel
     @State var showPrivateKeyWarning: Bool = false
-
+    
+    var pubkey: String {
+        dms.pubkey
+    }
+    
     var Messages: some View {
         ScrollViewReader { scroller in
             ScrollView {
                 VStack(alignment: .leading) {
                     ForEach(Array(zip(dms.events, dms.events.indices)), id: \.0.id) { (ev, ind) in
                         DMView(event: dms.events[ind], damus_state: damus_state)
-                            .contextMenu{MenuItems(event: ev, keypair: damus_state.keypair, target_pubkey: ev.pubkey, bookmarks: damus_state.bookmarks)}
+                            .contextMenu{MenuItems(event: ev, keypair: damus_state.keypair, target_pubkey: ev.pubkey, bookmarks: damus_state.bookmarks, muted_threads: damus_state.muted_threads)}
                     }
                     EndBlock(height: 80)
                 }
@@ -120,7 +123,7 @@ struct DMChatView: View {
     func send_message() {
         let tags = [["p", pubkey]]
         let post_blocks = parse_post_blocks(content: dms.draft)
-        let post_tags = make_post_tags(post_blocks: post_blocks, tags: tags)
+        let post_tags = make_post_tags(post_blocks: post_blocks, tags: tags, silent_mentions: true)
         let content = render_blocks(blocks: post_tags.blocks)
         
         guard let dm = create_dm(content, to_pk: pubkey, tags: post_tags.tags, keypair: damus_state.keypair) else {
@@ -130,7 +133,10 @@ struct DMChatView: View {
 
         dms.draft = ""
 
-        damus_state.pool.send(.event(dm))
+        damus_state.postbox.send(dm)
+        
+        handle_incoming_dm(ev: dm, our_pubkey: damus_state.pubkey, dms: damus_state.dms, prev_events: NewEventsBits())
+
         end_editing()
     }
 
@@ -174,10 +180,9 @@ struct DMChatView_Previews: PreviewProvider {
     static var previews: some View {
         let ev = NostrEvent(content: "hi", pubkey: "pubkey", kind: 1, tags: [])
 
-        let model = DirectMessageModel(events: [ev], our_pubkey: "pubkey")
+        let model = DirectMessageModel(events: [ev], our_pubkey: "pubkey", pubkey: "the_pk")
 
-        DMChatView(damus_state: test_damus_state(), pubkey: "pubkey")
-            .environmentObject(model)
+        DMChatView(damus_state: test_damus_state(), dms: model)
     }
 }
 

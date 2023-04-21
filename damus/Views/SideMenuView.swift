@@ -22,11 +22,11 @@ struct SideMenuView: View {
     let verticalSpacing: CGFloat = 20
     
     func fillColor() -> Color {
-        colorScheme == .light ? Color("DamusWhite") : Color("DamusBlack")
+        colorScheme == .light ? DamusColors.white : DamusColors.black
     }
     
     func textColor() -> Color {
-        colorScheme == .light ? Color("DamusBlack") : Color("DamusWhite")
+        colorScheme == .light ? DamusColors.black : DamusColors.white
     }
     
     var current_nip69: NIP69? {
@@ -38,7 +38,7 @@ struct SideMenuView: View {
             GeometryReader { _ in
                 EmptyView()
             }
-            .background(Color("DamusDarkGrey").opacity(0.6))
+            .background(DamusColors.darkGrey.opacity(0.6))
             .opacity(isSidebarVisible ? 1 : 0)
             .animation(.default, value: isSidebarVisible)
             .onTapGesture {
@@ -83,7 +83,7 @@ struct SideMenuView: View {
                                                 NIP69Badge(nip69: nip69, pubkey: damus_state.pubkey, contacts: damus_state.contacts, clickable: true)
                                             } else {
                                                 Text("@" + name)
-                                                    .foregroundColor(Color("DamusMediumGrey"))
+                                                    .foregroundColor(DamusColors.mediumGrey)
                                                     .font(.body)
                                                     .lineLimit(1)
                                             }
@@ -109,7 +109,7 @@ struct SideMenuView: View {
                                 */
                                  
                                 NavigationLink(destination: MutelistView(damus_state: damus_state, users: get_mutelist_users(damus_state.contacts.mutelist) )) {
-                                    navLabel(title: NSLocalizedString("Blocked", comment: "Sidebar menu label for Profile view."), systemImage: "exclamationmark.octagon")
+                                    navLabel(title: NSLocalizedString("Muted", comment: "Sidebar menu label for muted users view."), systemImage: "exclamationmark.octagon")
                                 }
                                 
                                 NavigationLink(destination: RelayConfigView(state: damus_state)) {
@@ -158,7 +158,7 @@ struct SideMenuView: View {
                                 .font(.title)
                                 .foregroundColor(textColor())
                         }).fullScreenCover(isPresented: $showQRCode) {
-                            QRCodeView(damus_state: damus_state)
+                            QRCodeView(damus_state: damus_state, pubkey: damus_state.pubkey)
                         }
                     }
                     .padding(.top, verticalSpacing)
