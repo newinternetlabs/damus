@@ -57,7 +57,7 @@ func retrieve_pubkey_for_name(name: String) async -> NIP69Response? {
  
     guard let url = URL(string: "\(nodeURL.absoluteString)\(nip69.name)") else {
         print("generating lookup url for \(nip69.name) failed")
-        return nil`
+        return nil
     }
     print("nip69: fetching public key using node: \(url)")
     guard let ret = try? await URLSession.shared.data(from: url) else {
