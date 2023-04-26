@@ -34,6 +34,8 @@ struct ProfileName: View {
     
     @State var display_name: DisplayName?
     @State var nip05: NIP05?
+    @State var nip69: NIP69?
+
 
     init(pubkey: String, profile: Profile?, damus: DamusState, show_friend_confirmed: Bool, show_nip5_domain: Bool = true) {
         self.pubkey = pubkey
@@ -60,6 +62,10 @@ struct ProfileName: View {
     var current_nip05: NIP05? {
         nip05 ?? damus_state.profiles.is_validated(pubkey)
     }
+    
+    var current_nip69: NIP69? {
+        nip69 ?? damus_state.profiles.is_has_name(damus_state.pubkey)
+    }
         
     var current_display_name: DisplayName {
         return display_name ?? Profile.displayName(profile: profile, pubkey: pubkey)
@@ -70,16 +76,34 @@ struct ProfileName: View {
     }
     
     var body: some View {
-        HStack(spacing: 2) {
-            Text(verbatim: "\(prefix)\(name_choice)")
-                .font(.body)
-                .fontWeight(prefix == "@" ? .none : .bold)
-            if let nip05 = current_nip05 {
-                NIP05Badge(nip05: nip05, pubkey: pubkey, contacts: damus_state.contacts, show_domain: show_nip5_domain, clickable: true)
+        VStack(alignment: .leading, spacing: 2) {
+            HStack {
+                if let name = profile?.name {
+                    if let nip69 = current_nip69 {
+                        Text(verbatim: "\(prefix)\(nip69.name)")
+                            .font(.body)
+                            .fontWeight(prefix == "@" ? .none : .bold).foregroundColor(.accentColor)
+                            .lineLimit(1)
+                            .nip05_colorized(gradient: true)
+                        NIP69Badge(nip69: nip69, pubkey: damus_state.pubkey, contacts: damus_state.contacts, clickable: true)
+                    } else {
+                        Text(verbatim: "\(prefix)\(name_choice)")
+                            .foregroundColor(DamusColors.mediumGrey)
+                            .font(.body)
+                            .lineLimit(1)
+                    }
+                    if let friend = friend_icon {
+                        Image(systemName: friend)
+                            .foregroundColor(.gray)
+                    }
+                }
             }
-            if let friend = friend_icon, current_nip05 == nil {
-                Image(systemName: friend)
-                    .foregroundColor(.gray)
+            HStack {
+
+                if let nip05 = current_nip05 {
+                    NIP05Badge(nip05: nip05, pubkey: pubkey, contacts: damus_state.contacts, show_domain: show_nip5_domain, clickable: true)
+                }
+                
             }
         }
         .onReceive(handle_notify(.profile_updated)) { notif in

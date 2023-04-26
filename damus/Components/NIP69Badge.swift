@@ -26,7 +26,7 @@ struct NIP69Badge: View {
     var body: some View {
         HStack(spacing: 2) {
             LINEAR_GRADIENT
-                .mask(Image(systemName: "pill.fill").resizable()
+                .mask(Image(systemName: "checkmark.seal.fill").resizable()
                 ).frame(width: 14, height: 14)
                 .font(.footnote)
 
