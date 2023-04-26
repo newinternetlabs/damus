@@ -64,7 +64,7 @@ struct ProfileName: View {
     }
     
     var current_nip69: NIP69? {
-        nip69 ?? damus_state.profiles.is_has_name(damus_state.pubkey)
+        nip69 ?? damus_state.profiles.is_has_name(pubkey)
     }
         
     var current_display_name: DisplayName {
