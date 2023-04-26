@@ -32,11 +32,11 @@ struct NIP05Badge: View {
         Group {
             if nip05_color {
                 LINEAR_GRADIENT
-                    .mask(Image(systemName: "checkmark.seal.fill")
+                    .mask(Image(systemName: "globe")
                         .resizable()
                     ).frame(width: 14, height: 14)
             } else {
-                Image(systemName: "checkmark.seal.fill")
+                Image(systemName: "globe")
                     .font(.footnote)
                     .foregroundColor(.gray)
             }
@@ -45,13 +45,10 @@ struct NIP05Badge: View {
     
     var body: some View {
         HStack(spacing: 2) {
-
-            Seal
-            
             if show_domain {
                 
                 if clickable {
-                    Text(nip05.host)
+                    Text("\(nip05.username)@\(nip05.host)")
                         .nip05_colorized(gradient: nip05_color)
                         .onTapGesture {
                             if let nip5url = nip05.siteUrl {
@@ -63,6 +60,7 @@ struct NIP05Badge: View {
                         .foregroundColor(.gray)
                 }
             }
+            Seal
         }
 
     }

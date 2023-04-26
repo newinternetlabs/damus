@@ -18,7 +18,8 @@ struct EventProfileName: View {
     
     @State var display_name: DisplayName?
     @State var nip05: NIP05?
-    
+    @State var nip69: NIP69?
+
     let size: EventViewKind
     
     init(pubkey: String, profile: Profile?, damus: DamusState, show_friend_confirmed: Bool, size: EventViewKind = .normal) {
@@ -47,6 +48,10 @@ struct EventProfileName: View {
         nip05 ?? damus_state.profiles.is_validated(pubkey)
     }
     
+    var current_nip69: NIP69? {
+        nip69 ?? damus_state.profiles.is_has_name(pubkey)
+    }
+    
     var current_display_name: DisplayName {
         return display_name ?? Profile.displayName(profile: profile, pubkey: pubkey)
     }
@@ -67,12 +72,12 @@ struct EventProfileName: View {
                     .font(eventviewsize_to_font(size))
             }
             
-            if let nip05 = current_nip05 {
-                NIP05Badge(nip05: nip05, pubkey: pubkey, contacts: damus_state.contacts, show_domain: false, clickable: false)
+            if let nip69 = current_nip69 {
+                NIP69Badge(nip69: nip69, pubkey: damus_state.pubkey, contacts: damus_state.contacts, clickable: true)
             }
             
-            if let frend = friend_icon, current_nip05 == nil {
-                Label("", systemImage: frend)
+            if let friend = friend_icon {
+                Label("", systemImage: friend)
                     .foregroundColor(.gray)
                     .font(.footnote)
             }
